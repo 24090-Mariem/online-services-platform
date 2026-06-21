@@ -13,6 +13,15 @@ jobs:
   test-backend:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test_db
+        ports:
+          - 3306:3306
+
     defaults:
       run:
         working-directory: backend
@@ -24,10 +33,18 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
 
       - name: Install dependencies
         run: npm ci
 
       - name: Run tests
         run: npm test
+        env:
+          NODE_ENV: test
+          JWT_SECRET: test_secret_key
+          CLIENT_URL: http://localhost:3000
+          DB_HOST: 127.0.0.1
+          DB_USER: root
+          DB_PASSWORD: root
+          DB_NAME: test_db

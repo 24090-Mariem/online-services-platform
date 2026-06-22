@@ -54,14 +54,14 @@
 
   /* ===== Typography ===== */
   --font-display: 'Sora', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-md: 1.125rem;
-  --text-lg: 1.375rem;
-  --text-xl: 1.75rem;
-  --text-2xl: 2.25rem;
+  --font-body: 'Sawarabi Mincho', sans-serif;
+  --text-xs: 0.25rem;
+  --text-sm: 0.55rem;
+  --text-base: 0.65rem;
+  --text-md: 0.75rem;
+  --text-lg: 0.89rem;
+  --text-xl: 1rem;
+  --text-2xl: 2rem;
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-semibold: 600;

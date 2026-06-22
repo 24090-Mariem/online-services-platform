@@ -20,7 +20,12 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const csrfProtection = require('./middlewares/csrfMiddleware');
 const authRoutes = require('./routes/authRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const technicianRoutes = require('./routes/technicianRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 const errorHandler = require('./middlewares/errorMiddleware');
+const path = require('path');
 
 const app = express();
 
@@ -34,7 +39,13 @@ app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
 app.use(csrfProtection);
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.use('/api/auth', authRoutes);
+app.use('/api/administrateurs', adminRoutes);
+app.use('/api/techniciens', technicianRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/uploads', uploadRoutes);
 
 app.use(errorHandler);
 

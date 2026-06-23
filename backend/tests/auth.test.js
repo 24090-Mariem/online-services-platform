@@ -45,7 +45,7 @@ describe('AUTH MODULE TESTS', () => {
       .send({ email: testEmail, password });
 
     expect(res.statusCode).toBe(200);
-    expect(res.body).toHaveProperty('token');
+    expect(res.body.data).toHaveProperty('token');
   });
 
   it('should reject wrong password', async () => {

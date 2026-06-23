@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import InputField from '../../components/forms/InputField';
 import PasswordField from '../../components/forms/PasswordField';
@@ -7,6 +8,7 @@ import ErrorMessage from '../../components/ui/ErrorMessage';
 import { MailIcon } from '../../components/ui/Icons';
 
 export default function Register() {
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     nom: '',
     prenom: '',
@@ -27,11 +29,11 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
-    if (!form.nom) newErrors.nom = 'Nom requis';
-    if (!form.prenom) newErrors.prenom = 'Prénom requis';
-    if (!form.email) newErrors.email = 'Email requis';
-    if (!form.password) newErrors.password = 'Mot de passe requis';
-    else if (form.password.length < 8) newErrors.password = 'Minimum 8 caractères';
+    if (!form.nom) newErrors.nom = t('auth.name_required');
+    if (!form.prenom) newErrors.prenom = t('auth.firstname_required');
+    if (!form.email) newErrors.email = t('auth.email_required');
+    if (!form.password) newErrors.password = t('auth.password_required');
+    else if (form.password.length < 8) newErrors.password = t('auth.min_password');
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -60,7 +62,7 @@ export default function Register() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4" style={{ background: 'var(--color-background)' }}>
       <div
-        className="w-full max-w-md p-8 rounded-[var(--radius-lg)]"
+        className="w-full max-w-md p-8 max-sm:p-6 rounded-[var(--radius-lg)]"
         style={{
           background: 'var(--color-surface)',
           boxShadow: 'var(--shadow-md)',
@@ -68,18 +70,18 @@ export default function Register() {
         }}
       >
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text)', fontFamily: 'var(--font-display)' }}>
-            Inscription
+          <h1 className="text-2xl max-sm:text-xl font-bold" style={{ color: 'var(--color-text)', fontFamily: 'var(--font-display)' }}>
+            {t('auth.register_title')}
           </h1>
           <p className="mt-2 text-sm" style={{ color: 'var(--color-text-muted)' }}>
-            Créez votre compte client
+            {t('auth.register_subtitle')}
           </p>
         </div>
 
         <ErrorMessage message={error} />
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <div className="flex gap-4">
+          <div className="flex gap-4 max-sm:flex-col">
             <div className="flex-1">
               <InputField
                 id="nom"
@@ -141,14 +143,14 @@ export default function Register() {
               color: '#fff',
             }}
           >
-            {submitting ? 'Inscription...' : "S'inscrire"}
+            {submitting ? t('auth.register_loading') : t('auth.register_submit')}
           </button>
         </form>
 
         <p className="mt-6 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
-          Déjà un compte ?{' '}
+          {t('auth.have_account')}{' '}
           <Link to="/login" style={{ color: 'var(--color-secondary)', fontWeight: 600, textDecoration: 'none' }}>
-            Se connecter
+            {t('auth.sign_in')}
           </Link>
         </p>
       </div>

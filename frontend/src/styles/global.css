@@ -55,17 +55,22 @@
   /* ===== Typography ===== */
   --font-display: 'Sora', sans-serif;
   --font-body: 'Sawarabi Mincho', sans-serif;
-  --text-xs: 0.25rem;
-  --text-sm: 0.55rem;
-  --text-base: 0.65rem;
-  --text-md: 0.75rem;
-  --text-lg: 0.89rem;
-  --text-xl: 1rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.125rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
   --text-2xl: 2rem;
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-semibold: 600;
   --weight-bold: 700;
+
+  /* ===== Direction ===== */
+  --direction: ltr;
+  --start: left;
+  --end: right;
 
   /* ===== Spacing ===== */
   --space-1: 4px;
@@ -110,7 +115,12 @@
   --shadow-md: 0 4px 12px rgba(0,0,0,0.30);
 }
 
- 
+[dir="rtl"] {
+  --direction: rtl;
+  --start: right;
+  --end: left;
+}
+
 body {
   margin: 0;
   font-family: var(--font-body);

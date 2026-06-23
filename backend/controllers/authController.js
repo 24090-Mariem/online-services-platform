@@ -24,12 +24,7 @@ const login = async (req, res, next) => {
 
     sendAccessTokenCookie(res, accessToken);
     sendRefreshTokenCookie(res, refreshToken);
-    res.status(200).json({
-      success: true,
-      message: 'Connexion réussie',
-      token: accessToken,
-      data: { user },
-    });
+    sendSuccess(res, { user, token: accessToken }, 'Connexion réussie');
   } catch (error) {
     next(error);
   }

@@ -4,6 +4,7 @@ const technicienController = require('../controllers/TechnicienController');
 const { protect, authorize } = require('../middlewares/authMiddleware');
 const upload = require('../config/upload');
 
+router.get('/', technicienController.listPublic);
 router.get('/public', technicienController.listPublic);
 router.get('/public/:id', technicienController.getPublicProfile);
 router.get('/search', technicienController.search);
@@ -16,7 +17,7 @@ router.post('/demande', upload.fields([
 
 router.use(protect, authorize('admin'));
 
-router.get('/', technicienController.list);
+router.get('/all', technicienController.list);
 router.post('/', upload.fields([
   { name: 'piece_identite', maxCount: 1 },
   { name: 'photo_profil', maxCount: 1 }

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { getDashboardPath } from '../../utils/dashboard';
 import InputField from '../../components/forms/InputField';
@@ -8,6 +9,7 @@ import ErrorMessage from '../../components/ui/ErrorMessage';
 import { MailIcon } from '../../components/ui/Icons';
 
 export default function Login() {
+  const { t } = useTranslation();
   const [form, setForm] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -24,8 +26,8 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
-    if (!form.email) newErrors.email = 'Email requis';
-    if (!form.password) newErrors.password = 'Mot de passe requis';
+    if (!form.email) newErrors.email = t('auth.email_required');
+    if (!form.password) newErrors.password = t('auth.password_required');
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -55,7 +57,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4" style={{ background: 'var(--color-background)' }}>
       <div
-        className="w-full max-w-md p-8 rounded-[var(--radius-lg)]"
+        className="w-full max-w-md p-8 max-sm:p-6 rounded-[var(--radius-lg)]"
         style={{
           background: 'var(--color-surface)',
           boxShadow: 'var(--shadow-md)',
@@ -63,11 +65,11 @@ export default function Login() {
         }}
       >
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text)', fontFamily: 'var(--font-display)' }}>
-            Connexion
+          <h1 className="text-2xl max-sm:text-xl font-bold" style={{ color: 'var(--color-text)', fontFamily: 'var(--font-display)' }}>
+            {t('auth.login_title')}
           </h1>
           <p className="mt-2 text-sm" style={{ color: 'var(--color-text-muted)' }}>
-            Accédez à votre espace
+            {t('auth.login_subtitle')}
           </p>
         </div>
 
@@ -103,20 +105,20 @@ export default function Login() {
               color: '#fff',
             }}
           >
-            {submitting ? 'Connexion...' : 'Se connecter'}
+            {submitting ? t('auth.login_loading') : t('auth.login_submit')}
           </button>
 
           <div className="text-center">
             <Link to="/forgot-password" style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', textDecoration: 'none' }}>
-              Mot de passe oublié ?
+              {t('auth.forgot_password')}
             </Link>
           </div>
         </form>
 
         <p className="mt-6 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
-          Pas encore de compte ?{' '}
+          {t('auth.no_account')}{' '}
           <Link to="/register" style={{ color: 'var(--color-secondary)', fontWeight: 600, textDecoration: 'none' }}>
-            S'inscrire
+            {t('auth.sign_up')}
           </Link>
         </p>
       </div>

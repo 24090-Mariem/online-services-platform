@@ -6,6 +6,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentMode, setCurrentMode] = useState(() => localStorage.getItem('currentMode') || 'client');
 
   useEffect(() => {
     let mounted = true;
@@ -28,11 +29,20 @@ export function AuthProvider({ children }) {
 
   const clearError = useCallback(() => setError(null), []);
 
+  const switchMode = useCallback((mode) => {
+    setCurrentMode(mode);
+    localStorage.setItem('currentMode', mode);
+  }, []);
+
   const login = async (email, password) => {
     setError(null);
     try {
       const res = await authService.loginUser(email, password);
-      setUser(res.data.data.user);
+      const userData = res.data.data.user;
+      setUser(userData);
+      const role = userData.role || (Array.isArray(userData.roles) ? userData.roles[0] : null) || 'client';
+      setCurrentMode(role);
+      localStorage.setItem('currentMode', role);
       return res.data;
     } catch (err) {
       const data = err.response?.data;
@@ -47,7 +57,11 @@ export function AuthProvider({ children }) {
     setError(null);
     try {
       const res = await authService.registerUser(data);
-      setUser(res.data.data.user);
+      const userData = res.data.data.user;
+      setUser(userData);
+      const role = userData.role || (Array.isArray(userData.roles) ? userData.roles[0] : null) || 'client';
+      setCurrentMode(role);
+      localStorage.setItem('currentMode', role);
       return res.data;
     } catch (err) {
       const data = err.response?.data;
@@ -68,7 +82,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, register, logout, clearError }}>
+    <AuthContext.Provider value={{ user, setUser, loading, error, login, register, logout, clearError, currentMode, switchMode, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );

@@ -3,7 +3,7 @@ const pool = require('../config/db');
 const TechnicienModel = {
   async findAll() {
     const [rows] = await pool.execute(
-      `SELECT t.*, u.email, u.is_active, u.photo_profil, u.created_at
+      `SELECT t.*, u.email, u.is_active, COALESCE(t.photo_profil, u.photo_profil) AS photo_profil, u.created_at
        FROM techniciens t
        JOIN users u ON u.id = t.user_id
        ORDER BY t.id DESC`
@@ -13,7 +13,7 @@ const TechnicienModel = {
 
   async findById(id) {
     const [rows] = await pool.execute(
-      `SELECT t.*, u.email, u.is_active, u.photo_profil, u.created_at
+      `SELECT t.*, u.email, u.is_active, COALESCE(t.photo_profil, u.photo_profil) AS photo_profil, u.created_at
        FROM techniciens t
        JOIN users u ON u.id = t.user_id
        WHERE t.id = ?`,

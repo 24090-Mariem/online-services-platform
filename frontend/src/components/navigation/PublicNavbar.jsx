@@ -28,15 +28,13 @@ const IconBrand = () => (
 );
 
 export default function PublicNavbar() {
-  const { isAuthenticated, user, currentMode, logout } = useAuth();
+  const { isAuthenticated, currentMode, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { t } = useTranslation();
 
   const handleLogout = async () => {
     await logout();
   };
-
-  const modeLabel = currentMode === 'technicien' ? t('nav.technician') : t('nav.client');
 
   return (
     <nav className="fixed top-0 left-0 right-0 h-[64px] bg-[var(--color-background)] border-b border-[var(--color-border)] flex items-center px-5 z-[100] gap-4">

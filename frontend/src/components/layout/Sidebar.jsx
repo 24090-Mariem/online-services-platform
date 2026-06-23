@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { SIDEBAR_CONFIG } from "./sidebarConfig";
 
 const ICONS = {
@@ -139,38 +140,8 @@ const ICONS = {
   ),
 };
 
-const LABELS = {
-  "sidebar.dashboard": "Tableau de bord",
-  "sidebar.section_users": "Utilisateurs",
-  "sidebar.administrators": "Administrateurs",
-  "sidebar.requests": "Demandes",
-  "sidebar.technicians": "Techniciens",
-  "sidebar.section_management": "Gestion",
-  "sidebar.services": "Services",
-  "sidebar.categories": "Catégories",
-  "sidebar.reviews": "Avis",
-  "sidebar.reports": "Signalements",
-  "sidebar.notifications": "Notifications",
-  "sidebar.statistics": "Statistiques",
-  "sidebar.section_my_space": "Mon espace",
-  "sidebar.admin_profile": "Profil",
-  "sidebar.app_settings": "Paramètres app",
-  "sidebar.logout": "Déconnexion",
-  "sidebar.my_services": "Mes services",
-  "sidebar.reservations": "Réservations",
-  "sidebar.my_schedule": "Mon planning",
-  "sidebar.my_profile": "Mon profil",
-  "sidebar.settings": "Paramètres",
-  "sidebar.welcome": "Accueil",
-  "sidebar.my_reservations": "Mes réservations",
-  "sidebar.my_reviews": "Mes avis",
-};
-
-function t(key) {
-  return LABELS[key] || key;
-}
-
 function SidebarItem({ item, activePage, onNavigate }) {
+  const { t } = useTranslation();
   const hasChildren = item.children && item.children.length > 0;
   const isChildActive = hasChildren && item.children.some(c => c.key === activePage);
   const isActive = activePage === item.key || isChildActive;
@@ -249,6 +220,7 @@ function SidebarItem({ item, activePage, onNavigate }) {
 }
 
 export default function Sidebar({ role = "admin", activePage = "dashboard", onNavigate, isOpen = false }) {
+  const { t } = useTranslation();
   const config = SIDEBAR_CONFIG[role] || SIDEBAR_CONFIG.admin;
 
   const resolveItem = (item) => {

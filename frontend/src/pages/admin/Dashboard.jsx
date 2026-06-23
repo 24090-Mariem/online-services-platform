@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { ROUTE_MAP, getActiveKey } from '../../components/layout/sidebarConfig';
@@ -9,6 +10,7 @@ import GestionTechniciens from './GestionTechniciens';
 import Categories from './Categories';
 
 export default function AdminDashboard() {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,7 +27,7 @@ export default function AdminDashboard() {
   return (
     <DashboardLayout
       role="admin"
-      user={{ name: (user?.prenom || '') + ' ' + (user?.nom || ''), role: 'Administrateur' }}
+      user={{ name: (user?.prenom || '') + ' ' + (user?.nom || ''), role: t('profile.role_admin') }}
       activePage={getActiveKey(location.pathname)}
       onNavigate={handleNavigate}
     >

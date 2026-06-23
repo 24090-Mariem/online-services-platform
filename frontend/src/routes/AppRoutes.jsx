@@ -5,11 +5,13 @@ import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 import ForgotPassword from '../pages/auth/ForgotPassword';
 import ResetPassword from '../pages/auth/ResetPassword';
-import Home from '../pages/Home';
-import DashboardLayout from '../components/layout/DashboardLayout';
+import HomePage from '../pages/HomePage';
 import ClientDashboard from '../pages/client/Dashboard';
 import TechnicienDashboard from '../pages/technicien/Dashboard';
 import AdminDashboard from '../pages/admin/Dashboard';
+import PublicLayout from '../components/layout/PublicLayout';
+import NotificationsPage from '../pages/common/NotificationsPage';
+import PublicTechnicienProfile from '../pages/common/PublicTechnicienProfile';
 
 function LoadingScreen() {
   return (
@@ -41,6 +43,14 @@ function PublicRoute({ children }) {
   return user ? <Navigate to={getDashboardPath(user.role)} replace /> : children;
 }
 
+function PublicHomeRoute({ children }) {
+  const { user, loading } = useAuth();
+
+  if (loading) return <LoadingScreen />;
+  if (user) return <Navigate to={getDashboardPath(user.role)} replace />;
+  return children;
+}
+
 export default function AppRoutes() {
   return (
     <Routes>
@@ -49,16 +59,30 @@ export default function AppRoutes() {
       <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
       <Route path="/reset-password" element={<ResetPassword />} />
 
-      <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+      <Route path="/technicien/:id" element={<PublicLayout><PublicTechnicienProfile /></PublicLayout>} />
 
-      <Route path="/client/dashboard" element={
-        <ProtectedRoute roles={['client']}>
-          <DashboardLayout><ClientDashboard /></DashboardLayout>
+      <Route path="/notifications" element={
+        <ProtectedRoute>
+          <NotificationsPage />
         </ProtectedRoute>
       } />
-      <Route path="/technicien/dashboard" element={
+
+      <Route path="/" element={
+        <PublicHomeRoute>
+          <PublicLayout>
+            <HomePage />
+          </PublicLayout>
+        </PublicHomeRoute>
+      } />
+
+      <Route path="/client/dashboard/*" element={
+        <ProtectedRoute roles={['client']}>
+          <ClientDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/technicien/dashboard/*" element={
         <ProtectedRoute roles={['technicien']}>
-          <DashboardLayout><TechnicienDashboard /></DashboardLayout>
+          <TechnicienDashboard />
         </ProtectedRoute>
       } />
       <Route path="/admin/dashboard/*" element={

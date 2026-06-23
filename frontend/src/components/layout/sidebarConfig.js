@@ -24,12 +24,11 @@ export const ROUTE_MAP = {
   "tech-settings":     "/technicien/dashboard/parametres",
   "tech-system":       "/technicien/dashboard/systeme",
 
-  "client-dashboard":    "/dashboard",
-  "client-reservations": "/dashboard/mes-reservations",
-  "client-reviews":      "/dashboard/mes-avis",
-  "client-profile":      "/dashboard/profil",
+  "client-dashboard":    "/client/dashboard",
+  "client-reservations": "/client/dashboard/mes-reservations",
+  "client-reviews":      "/client/dashboard/mes-avis",
+  "client-profile":      "/client/dashboard/profil",
 
-  "notifications":       "/notifications",
   "client-notifications":"/notifications",
   "tech-notifications":  "/notifications",
 };
@@ -38,8 +37,18 @@ const _reverseMap = Object.fromEntries(
   Object.entries(ROUTE_MAP).map(([k, v]) => [v, k])
 );
 
+const _notificationKeys = ['client-notifications', 'tech-notifications', 'notifications'];
+
 export function getActiveKey(pathname, fallback = 'dashboard') {
-  return _reverseMap[pathname] || fallback;
+  const cleaned = pathname.replace(/\/+$/, '');
+  const exact = _reverseMap[cleaned] || _reverseMap[cleaned + '/'];
+  if (exact && !_notificationKeys.includes(exact)) return exact;
+  if (cleaned === '/notifications') {
+    if (fallback === 'client-dashboard') return 'client-notifications';
+    if (fallback === 'tech-dashboard' || fallback.startsWith('tech-')) return 'tech-notifications';
+    return 'notifications';
+  }
+  return fallback;
 }
 
 export const SIDEBAR_CONFIG = {

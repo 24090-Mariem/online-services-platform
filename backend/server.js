@@ -24,6 +24,12 @@ const adminRoutes = require('./routes/adminRoutes');
 const technicianRoutes = require('./routes/technicianRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
+const serviceRoutes = require('./routes/serviceRoutes');
+const reservationRoutes = require('./routes/reservationRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
+const statsRoutes = require('./routes/statsRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+const userRoutes = require('./routes/userRoutes');
 const errorHandler = require('./middlewares/errorMiddleware');
 const path = require('path');
 
@@ -46,15 +52,23 @@ app.use('/api/administrateurs', adminRoutes);
 app.use('/api/techniciens', technicianRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/uploads', uploadRoutes);
+app.use('/api/services', serviceRoutes);
+app.use('/api/reservations', reservationRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/stats', statsRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/users', userRoutes);
 
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 
 if (require.main === module) {
-  app.listen(PORT, () => {
+  const httpServer = app.listen(PORT, () => {
     console.log(`Serveur démarré sur le port ${PORT}`);
   });
+  const { initIO } = require('./config/socket');
+  initIO(httpServer);
 }
 
 module.exports = app;

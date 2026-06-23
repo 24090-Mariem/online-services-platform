@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import InputField from '../../components/forms/InputField';
 import PasswordField from '../../components/forms/PasswordField';
 import ErrorMessage from '../../components/ui/ErrorMessage';
 import api from '../../services/authService';
 
 export default function ResetPassword() {
+  const { t } = useTranslation();
   const [code, setCode] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -19,17 +21,17 @@ export default function ResetPassword() {
     const newErrors = {};
 
     if (!code || code.length !== 6) {
-      newErrors.code = 'Code à 6 chiffres requis';
+      newErrors.code = t('auth.reset_code_required');
     }
 
     if (!password) {
-      newErrors.password = 'Mot de passe requis';
+      newErrors.password = t('auth.password_required');
     } else if (password.length < 8) {
-      newErrors.password = 'Minimum 8 caractères';
+      newErrors.password = t('auth.min_password');
     }
 
     if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'Les mots de passe ne correspondent pas';
+      newErrors.confirmPassword = t('auth.reset_password_mismatch');
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -44,7 +46,7 @@ export default function ResetPassword() {
       setSuccess(true);
     } catch (err) {
       const data = err.response?.data;
-      setApiError(data?.message || 'Erreur lors de la réinitialisation');
+      setApiError(data?.message || t('auth.reset_error'));
     } finally {
       setSubmitting(false);
     }
@@ -54,7 +56,7 @@ export default function ResetPassword() {
     return (
       <div className="min-h-screen flex items-center justify-center px-4" style={{ background: 'var(--color-background)' }}>
         <div
-          className="w-full max-w-md p-8 rounded-[var(--radius-lg)]"
+          className="w-full max-w-md p-8 max-sm:p-6 rounded-[var(--radius-lg)]"
           style={{
             background: 'var(--color-surface)',
             boxShadow: 'var(--shadow-md)',
@@ -62,18 +64,18 @@ export default function ResetPassword() {
           }}
         >
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text)', fontFamily: 'var(--font-display)' }}>
-              Mot de passe réinitialisé
+            <h1 className="text-2xl max-sm:text-xl font-bold" style={{ color: 'var(--color-text)', fontFamily: 'var(--font-display)' }}>
+              {t('auth.reset_success_title')}
             </h1>
             <p className="mt-2 text-sm" style={{ color: 'var(--color-text-muted)' }}>
-              Votre mot de passe a été modifié avec succès.
+              {t('auth.reset_success_text')}
             </p>
           </div>
           <div className="text-center">
             <Link to="/login"
               style={{ color: 'var(--color-secondary)', fontWeight: 600, textDecoration: 'none' }}
             >
-              Se connecter
+              {t('auth.sign_in')}
             </Link>
           </div>
         </div>
@@ -84,7 +86,7 @@ export default function ResetPassword() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4" style={{ background: 'var(--color-background)' }}>
       <div
-        className="w-full max-w-md p-8 rounded-[var(--radius-lg)]"
+        className="w-full max-w-md p-8 max-sm:p-6 rounded-[var(--radius-lg)]"
         style={{
           background: 'var(--color-surface)',
           boxShadow: 'var(--shadow-md)',
@@ -92,11 +94,11 @@ export default function ResetPassword() {
         }}
       >
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text)', fontFamily: 'var(--font-display)' }}>
-            Réinitialisation
+          <h1 className="text-2xl max-sm:text-xl font-bold" style={{ color: 'var(--color-text)', fontFamily: 'var(--font-display)' }}>
+            {t('auth.reset_title')}
           </h1>
           <p className="mt-2 text-sm" style={{ color: 'var(--color-text-muted)' }}>
-            Saisissez le code reçu par email et votre nouveau mot de passe
+            {t('auth.reset_subtitle')}
           </p>
         </div>
 
@@ -105,7 +107,7 @@ export default function ResetPassword() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <InputField
             id="code"
-            label="Code de réinitialisation"
+            label={t('auth.reset_code_label')}
             type="text"
             placeholder="000000"
             maxLength={6}
@@ -116,8 +118,8 @@ export default function ResetPassword() {
 
           <PasswordField
             id="password"
-            label="Nouveau mot de passe"
-            placeholder="Minimum 8 caractères"
+            label={t('auth.reset_new_password')}
+            placeholder={t('auth.min_password')}
             value={password}
             showStrength
             onChange={(e) => { setPassword(e.target.value); setErrors(prev => ({ ...prev, password: '' })); }}
@@ -126,8 +128,8 @@ export default function ResetPassword() {
 
           <PasswordField
             id="confirmPassword"
-            label="Confirmer le mot de passe"
-            placeholder="Répétez le mot de passe"
+            label={t('auth.reset_confirm_password')}
+            placeholder={t('auth.reset_confirm_password')}
             value={confirmPassword}
             onChange={(e) => { setConfirmPassword(e.target.value); setErrors(prev => ({ ...prev, confirmPassword: '' })); }}
             error={errors.confirmPassword}
@@ -142,13 +144,13 @@ export default function ResetPassword() {
               color: '#fff',
             }}
           >
-            {submitting ? 'Réinitialisation...' : 'Réinitialiser'}
+            {submitting ? t('auth.reset_loading') : t('auth.reset_submit')}
           </button>
         </form>
 
         <p className="mt-6 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
           <Link to="/forgot-password" style={{ color: 'var(--color-secondary)', fontWeight: 600, textDecoration: 'none' }}>
-            Renvoyer un code
+            {t('auth.send_code_again')}
           </Link>
         </p>
       </div>

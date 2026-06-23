@@ -22,7 +22,7 @@ const protect = async (req, res, next) => {
       return sendError(res, 'Compte désactivé', 403);
     }
 
-    req.user = { id: user.id, email: user.email, role: user.role };
+    req.user = { id: user.id, user_id: user.id, email: user.email, role: user.role };
     next();
   } catch (error) {
     clearAuthCookies(res);

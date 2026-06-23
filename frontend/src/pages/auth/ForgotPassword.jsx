@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import InputField from '../../components/forms/InputField';
 import ErrorMessage from '../../components/ui/ErrorMessage';
 import { MailIcon } from '../../components/ui/Icons';
 import api from '../../services/authService';
 
 export default function ForgotPassword() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [error, setError] = useState(null);
@@ -14,7 +16,7 @@ export default function ForgotPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email) {
-      setError('Email requis');
+      setError(t('auth.email_required'));
       return;
     }
 
@@ -25,7 +27,7 @@ export default function ForgotPassword() {
       navigate('/reset-password');
     } catch (err) {
       const data = err.response?.data;
-      setError(data?.message || 'Erreur lors de la demande');
+      setError(data?.message || t('auth.forgot_error'));
     } finally {
       setSubmitting(false);
     }
@@ -34,7 +36,7 @@ export default function ForgotPassword() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4" style={{ background: 'var(--color-background)' }}>
       <div
-        className="w-full max-w-md p-8 rounded-[var(--radius-lg)]"
+        className="w-full max-w-md p-8 max-sm:p-6 rounded-[var(--radius-lg)]"
         style={{
           background: 'var(--color-surface)',
           boxShadow: 'var(--shadow-md)',
@@ -42,11 +44,11 @@ export default function ForgotPassword() {
         }}
       >
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text)', fontFamily: 'var(--font-display)' }}>
-            Mot de passe oublié
+          <h1 className="text-2xl max-sm:text-xl font-bold" style={{ color: 'var(--color-text)', fontFamily: 'var(--font-display)' }}>
+            {t('auth.forgot_password')}
           </h1>
           <p className="mt-2 text-sm" style={{ color: 'var(--color-text-muted)' }}>
-            Entrez votre email pour recevoir un code de réinitialisation
+            {t('auth.forgot_subtitle')}
           </p>
         </div>
 
@@ -72,13 +74,13 @@ export default function ForgotPassword() {
               color: '#fff',
             }}
           >
-            {submitting ? 'Envoi...' : 'Envoyer'}
+            {submitting ? t('auth.forgot_loading') : t('auth.forgot_submit')}
           </button>
         </form>
 
         <p className="mt-6 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
           <Link to="/login" style={{ color: 'var(--color-secondary)', fontWeight: 600, textDecoration: 'none' }}>
-            Retour à la connexion
+            {t('auth.forgot_back')}
           </Link>
         </p>
       </div>

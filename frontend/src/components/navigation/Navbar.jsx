@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../../context/ThemeContext';
+import LanguageSelector from '../ui/LanguageSelector';
 
 const IconSearch = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -12,22 +15,6 @@ const IconHelp = () => (
     stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="10"/>
     <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-  </svg>
-);
-const IconMoon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-  </svg>
-);
-const IconSun = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="5"/>
-    <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
-    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-    <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
-    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
   </svg>
 );
 const IconBell = () => (
@@ -52,10 +39,29 @@ const IconBrand = () => (
   </svg>
 );
 
+const IconMoon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+  </svg>
+);
+const IconSun = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="5"/>
+    <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+    <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+  </svg>
+);
+
 const getInitials = (name = "") =>
   name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
 
-export default function Navbar({ user = {}, onMenuToggle, userRoles = [] }) {
+export default function Navbar({ user = {}, onMenuToggle }) {
+  const { t } = useTranslation();
+  const { theme, toggleTheme } = useTheme();
   const [searchValue, setSearchValue] = useState("");
   const badgeCount = 0;
 
@@ -90,7 +96,7 @@ export default function Navbar({ user = {}, onMenuToggle, userRoles = [] }) {
             placeholder:text-[var(--color-text-secondary)]
             focus:border-[var(--color-secondary)] focus:shadow-[var(--shadow-input-focus)] focus:bg-[var(--color-background)]
             transition-[border-color,box-shadow,background] duration-[var(--transition-base)]"
-          placeholder="Rechercher..."
+          placeholder={t('nav.search_placeholder')}
           value={searchValue}
           onChange={e => setSearchValue(e.target.value)}
         />
@@ -99,13 +105,17 @@ export default function Navbar({ user = {}, onMenuToggle, userRoles = [] }) {
       <div className="flex-1" />
 
       <div className="flex items-center gap-1">
-        <button className="w-[38px] h-[38px] rounded-[var(--radius-md)] border-none bg-transparent text-[var(--color-text-muted)] flex items-center justify-center cursor-pointer transition-[background,color] duration-[var(--transition-base)] hover:bg-[var(--color-surface)] hover:text-[var(--color-secondary)]" title="Aide">
+        <LanguageSelector />
+        <button className="w-[38px] h-[38px] rounded-[var(--radius-md)] border-none bg-transparent text-[var(--color-text-muted)] flex items-center justify-center cursor-pointer transition-[background,color] duration-[var(--transition-base)] hover:bg-[var(--color-surface)] hover:text-[var(--color-secondary)]" onClick={toggleTheme} title={theme === 'dark' ? t('nav.theme_light') : t('nav.theme_dark')}>
+          {theme === 'dark' ? <IconSun /> : <IconMoon />}
+        </button>
+        <button className="w-[38px] h-[38px] rounded-[var(--radius-md)] border-none bg-transparent text-[var(--color-text-muted)] flex items-center justify-center cursor-pointer transition-[background,color] duration-[var(--transition-base)] hover:bg-[var(--color-surface)] hover:text-[var(--color-secondary)]" title={t('nav.help')}>
           <IconHelp />
         </button>
         <Link
           to="/notifications"
           className="relative w-[38px] h-[38px] rounded-[var(--radius-md)] border-none bg-transparent text-[var(--color-text-muted)] flex items-center justify-center no-underline transition-[background,color] duration-[var(--transition-base)] hover:bg-[var(--color-surface)] hover:text-[var(--color-secondary)]"
-          title="Notifications"
+          title={t('notifications.title')}
         >
           <IconBell />
           {badgeCount > 0 && (
@@ -120,8 +130,8 @@ export default function Navbar({ user = {}, onMenuToggle, userRoles = [] }) {
 
       <div className="flex items-center gap-[10px] py-[6px] px-[10px] rounded-[var(--radius-md)] transition-[background] duration-[var(--transition-base)]">
         <div className="text-right leading-[1.25] max-md:hidden">
-          <span className="text-[var(--text-md)] font-bold text-[var(--color-text)] block">{user.name || 'Utilisateur'}</span>
-          <span className="text-[var(--text-xs)] text-[var(--color-text-muted)] font-medium">{user.role || 'admin'}</span>
+          <span className="text-[var(--text-md)] font-bold text-[var(--color-text)] block">{user.name || t('nav.default_user')}</span>
+          <span className="text-[var(--text-xs)] text-[var(--color-text-muted)] font-medium">{user.role || t('nav.default_role')}</span>
         </div>
         {user.photo_profil ? (
           <img src={`/uploads/${user.photo_profil}`} alt={user.name} className="w-[38px] h-[38px] rounded-full object-cover border-2 border-[var(--color-primary)]/20" />

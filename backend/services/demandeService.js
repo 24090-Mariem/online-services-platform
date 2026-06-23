@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const pool = require('../config/db');
 const bcrypt = require('bcrypt');
 const UserModel = require('../models/UserModel');
@@ -20,18 +21,19 @@ const demandeService = {
     if (existing) {
       throw new AppError('Cet email est déjà utilisé', 409);
     }
-    const password_hash = await bcrypt.hash('temp1234', 12);
+    const tempPassword = crypto.randomBytes(8).toString('hex');
+    const password_hash = await bcrypt.hash(tempPassword, 12);
     const conn = await pool.getConnection();
     try {
       await conn.beginTransaction();
       const userId = await UserModel.createUser(conn, { email, password_hash });
       await conn.execute(
-        `INSERT INTO demandes_techniciens (user_id, nom, specialite, piece_identite, photo_profil, diplome, statut)
-         VALUES (?, ?, ?, ?, ?, ?, 'EN_ATTENTE')`,
-        [userId, nom, specialite, piece_identite || null, photo_profil || null, diplome || null]
+        `INSERT INTO demandes_techniciens (user_id, nom, prenom, email, telephone, specialite, piece_identite, photo_profil, diplome, statut)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'EN_ATTENTE')`,
+        [userId, nom, prenom || null, email, telephone || null, specialite, piece_identite || null, photo_profil || null, diplome || null]
       );
       await conn.commit();
-      return userId;
+      return { userId, tempPassword };
     } catch (err) {
       await conn.rollback();
       throw err;
@@ -50,16 +52,12 @@ const demandeService = {
     try {
       await conn.beginTransaction();
       const clientExists = await this._checkClientExists(conn, demande.user_id);
-      if (!clientExists) {
-        await conn.execute(
-          'INSERT INTO techniciens (user_id, nom, prenom, telephone, specialite, piece_identite, photo_profil, est_verifie) VALUES (?, ?, ?, ?, ?, ?, ?, 1)',
-          [demande.user_id, demande.nom, '', null, demande.specialite, demande.piece_identite, demande.photo_profil]
-        );
-      } else {
-        await conn.execute(
-          'INSERT INTO techniciens (user_id, nom, prenom, telephone, specialite, piece_identite, photo_profil, est_verifie) VALUES (?, ?, ?, ?, ?, ?, ?, 1)',
-          [demande.user_id, demande.nom, '', null, demande.specialite, demande.piece_identite, demande.photo_profil]
-        );
+      await conn.execute(
+        'INSERT INTO techniciens (user_id, nom, prenom, telephone, specialite, piece_identite, photo_profil, est_verifie) VALUES (?, ?, ?, ?, ?, ?, ?, 1)',
+        [demande.user_id, demande.nom, demande.prenom || '', demande.telephone || null, demande.specialite, demande.piece_identite, demande.photo_profil]
+      );
+      if (clientExists) {
+        await conn.execute('DELETE FROM clients WHERE user_id = ?', [demande.user_id]);
       }
       await conn.execute(
         "UPDATE demandes_techniciens SET statut = 'APPROUVE', commentaire_admin = ? WHERE id = ?",

@@ -7,7 +7,10 @@ import { ROUTE_MAP, getActiveKey } from '../../components/layout/sidebarConfig';
 import TableauDeBord from './TableauDeBord';
 import GestionAdministrateurs from './GestionAdministrateurs';
 import GestionTechniciens from './GestionTechniciens';
+import GestionDemandes from './GestionDemandes';
+import GestionServices from './GestionServices';
 import Categories from './Categories';
+import NotificationsPanel from '../../components/notifications/NotificationsPanel';
 
 export default function AdminDashboard() {
   const { t } = useTranslation();
@@ -35,7 +38,10 @@ export default function AdminDashboard() {
         <Route index element={<TableauDeBord />} />
         <Route path="administrateurs" element={<GestionAdministrateurs />} />
         <Route path="techniciens" element={<GestionTechniciens />} />
+        <Route path="demandes" element={<GestionDemandes />} />
+        <Route path="services" element={<GestionServices />} />
         <Route path="categories" element={<Categories />} />
+        <Route path="notifications" element={<NotificationsPanel />} />
         <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
       </Routes>
     </DashboardLayout>

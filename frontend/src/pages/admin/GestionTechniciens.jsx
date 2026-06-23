@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 import AdminPageLayout from '../../components/layout/AdminPageLayout';
@@ -6,18 +6,20 @@ import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
 const emptyForm = {
   nom: '', prenom: '', email: '', telephone: '',
-  adresse: '', specialite: '', password: '',
+  adresse: '', categorie_id: '', password: '',
   piece_identite: null, photo_profil: null,
 };
 
 export default function GestionTechniciens() {
   const { t } = useTranslation();
   const [techniciens, setTechniciens] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [form, setForm] = useState({ ...emptyForm });
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [search, setSearch] = useState('');
 
   const showMessage = (type, text) => {
     setMessage({ type, text });
@@ -27,8 +29,12 @@ export default function GestionTechniciens() {
   const load = async () => {
     setLoading(true);
     try {
-      const res = await api.get('/techniciens');
-      setTechniciens(res.data.data || []);
+      const [techRes, catRes] = await Promise.all([
+        api.get('/techniciens/all'),
+        api.get('/categories'),
+      ]);
+      setTechniciens(techRes.data.data || []);
+      setCategories(catRes.data.data || []);
     } catch {
       showMessage('error', t('admin.load_error_generic'));
     } finally { setLoading(false); }
@@ -38,6 +44,16 @@ export default function GestionTechniciens() {
     (async () => { await load(); })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const filtered = useMemo(() => {
+    if (!search.trim()) return techniciens;
+    const q = search.toLowerCase();
+    return techniciens.filter(t =>
+      (t.nom || '').toLowerCase().includes(q) ||
+      (t.prenom || '').toLowerCase().includes(q) ||
+      (t.email || '').toLowerCase().includes(q)
+    );
+  }, [techniciens, search]);
 
   const resetForm = () => { setForm({ ...emptyForm }); setEditingId(null); };
 
@@ -50,20 +66,25 @@ export default function GestionTechniciens() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const hasFiles = form.piece_identite || form.photo_profil;
+      const cat = categories.find(c => String(c.id) === String(form.categorie_id));
+      const payload = {
+        ...form,
+        specialite: cat ? cat.nom : form.specialite,
+        categorie_id: undefined,
+      };
       if (editingId) {
-        const { password, ...data } = form;
-        await api.put(`/techniciens/${editingId}`, password ? form : data);
+          const data = { ...payload };
+          delete data.password; delete data.categorie_id; delete data.piece_identite; delete data.photo_profil;
+          await api.put(`/techniciens/${editingId}`, form.password ? { ...data, password: form.password } : data);
         showMessage('success', t('admin.technician_updated'));
-      } else if (hasFiles) {
+      } else {
         const fd = new FormData();
-        Object.keys(emptyForm).forEach(key => {
-          if (form[key] !== null && form[key] !== undefined) fd.append(key, form[key]);
+        Object.keys(payload).forEach(key => {
+          if (payload[key] !== null && payload[key] !== undefined && key !== 'categorie_id') {
+            fd.append(key, payload[key]);
+          }
         });
         await api.post('/techniciens', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-        showMessage('success', t('admin.technician_created'));
-      } else {
-        await api.post('/techniciens', form);
         showMessage('success', t('admin.technician_created'));
       }
       resetForm();
@@ -74,7 +95,13 @@ export default function GestionTechniciens() {
   };
 
   const handleEdit = (tech) => {
-    setForm({ nom: tech.nom, prenom: tech.prenom, email: tech.email, telephone: tech.telephone || '', adresse: tech.adresse || '', specialite: tech.specialite || '', password: '', piece_identite: null, photo_profil: null });
+    const cat = categories.find(c => c.nom === tech.specialite);
+    setForm({
+      nom: tech.nom, prenom: tech.prenom, email: tech.email,
+      telephone: tech.telephone || '', adresse: tech.adresse || '',
+      categorie_id: cat ? String(cat.id) : '',
+      password: '', piece_identite: null, photo_profil: null,
+    });
     setEditingId(tech.id);
   };
 
@@ -85,15 +112,6 @@ export default function GestionTechniciens() {
       await load();
     } catch { showMessage('error', t('admin.delete_error')); }
   };
-
-  const fields = [
-    { name: 'nom', label: t('profile.label_nom'), required: true },
-    { name: 'prenom', label: t('profile.label_prenom'), required: true },
-    { name: 'email', label: t('profile.label_email'), type: 'email', required: true },
-    { name: 'telephone', label: t('profile.label_telephone') },
-    { name: 'adresse', label: t('profile.label_adresse') },
-    { name: 'specialite', label: t('profile.label_specialite'), required: true },
-  ];
 
   const inputClass = "py-[11px] px-3 border-[1.5px] border-[var(--color-border)] rounded-[var(--radius-md)] font-body text-sm text-[var(--color-text)] bg-[var(--color-surface)]";
 
@@ -108,21 +126,25 @@ export default function GestionTechniciens() {
       )}
       <form onSubmit={handleSubmit} className="mb-6">
         <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-3 mb-3">
-          {fields.map(f => (
-            <input key={f.name} name={f.name} type={f.type || 'text'} placeholder={f.label + (f.required ? ' *' : '')}
-              value={form[f.name]} onChange={handleChange} required={f.required} className={inputClass} />
-          ))}
-          <input name="password" type="password" placeholder={editingId ? t('admin.new_password') : 'Mot de passe *'}
-            value={form.password} onChange={handleChange} required={!editingId} className={inputClass} />
+          <input name="nom" placeholder={t('profile.label_nom') + ' *'} value={form.nom} onChange={handleChange} required className={inputClass} />
+          <input name="prenom" placeholder={t('profile.label_prenom') + ' *'} value={form.prenom} onChange={handleChange} required className={inputClass} />
+          <input name="email" type="email" placeholder={t('profile.label_email') + ' *'} value={form.email} onChange={handleChange} required className={inputClass} />
+          <input name="telephone" placeholder={t('profile.label_telephone') + ' *'} value={form.telephone} onChange={handleChange} required className={inputClass} />
+          <input name="adresse" placeholder={t('profile.label_adresse') + ' *'} value={form.adresse} onChange={handleChange} required className={inputClass} />
+          <select name="categorie_id" value={form.categorie_id} onChange={handleChange} required className={inputClass}>
+            <option value="">{t('admin.select_specialite')}</option>
+            {categories.map(c => (
+              <option key={c.id} value={c.id}>{c.nom}</option>
+            ))}
+          </select>
+          <input name="password" type="password" placeholder={editingId ? t('admin.new_password') : 'Mot de passe *'} value={form.password} onChange={handleChange} required={!editingId} className={inputClass} />
           <div className="flex flex-col gap-1">
             <label className="text-xs font-semibold text-[var(--color-text)]">{t('admin.identity_doc')}</label>
-            <input name="piece_identite" type="file" accept=".pdf,.png,.jpg,.jpeg" onChange={handleChange}
-              className={`${inputClass} file:mr-3 file:py-1 file:px-3 file:rounded-[var(--radius-sm)] file:border-none file:bg-[var(--color-primary)] file:text-white file:text-xs file:font-semibold file:cursor-pointer`} />
+            <input name="piece_identite" type="file" accept=".pdf,.png,.jpg,.jpeg" onChange={handleChange} className={`${inputClass} file:mr-3 file:py-1 file:px-3 file:rounded-[var(--radius-sm)] file:border-none file:bg-[var(--color-primary)] file:text-white file:text-xs file:font-semibold file:cursor-pointer`} />
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-xs font-semibold text-[var(--color-text)]">{t('profile.photo_title')}</label>
-            <input name="photo_profil" type="file" accept=".png,.jpg,.jpeg,.webp" onChange={handleChange}
-              className={`${inputClass} file:mr-3 file:py-1 file:px-3 file:rounded-[var(--radius-sm)] file:border-none file:bg-[var(--color-primary)] file:text-white file:text-xs file:font-semibold file:cursor-pointer`} />
+            <input name="photo_profil" type="file" accept=".png,.jpg,.jpeg,.webp" onChange={handleChange} className={`${inputClass} file:mr-3 file:py-1 file:px-3 file:rounded-[var(--radius-sm)] file:border-none file:bg-[var(--color-primary)] file:text-white file:text-xs file:font-semibold file:cursor-pointer`} />
           </div>
         </div>
         <div className="flex gap-3">
@@ -139,19 +161,28 @@ export default function GestionTechniciens() {
         </div>
       </form>
 
+      <div className="mb-4">
+        <input
+          placeholder={t('admin.search_placeholder')}
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className={`${inputClass} w-full max-w-sm`}
+        />
+      </div>
+
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-[var(--text-xs)]">
           <thead>
             <tr><th className="text-left p-2">{t('profile.label_nom')}</th><th className="text-left p-2">{t('profile.label_prenom')}</th><th className="text-left p-2">{t('profile.label_email')}</th><th className="text-left p-2">{t('profile.label_telephone')}</th><th className="text-left p-2">{t('profile.label_specialite')}</th><th className="text-left p-2">{t('admin.actions_col')}</th></tr>
           </thead>
           <tbody>
-            {techniciens.map(tech => (
+            {filtered.map(tech => (
               <tr key={tech.id} className="border-t border-[var(--color-border)]">
                 <td className="p-2">{tech.nom}</td>
                 <td className="p-2">{tech.prenom}</td>
                 <td className="p-2">{tech.email}</td>
-                <td className="p-2">{tech.telephone || '—'}</td>
-                <td className="p-2">{tech.specialite || '—'}</td>
+                <td className="p-2">{tech.telephone || '\u2014'}</td>
+                <td className="p-2">{tech.specialite || '\u2014'}</td>
                 <td className="p-2">
                   <button onClick={() => handleEdit(tech)}
                     className="py-[6px] px-4 bg-[var(--color-primary)] text-white border-none rounded-[var(--radius-sm)] font-body text-[var(--text-xs)] cursor-pointer mr-1">{t('admin.edit')}</button>
@@ -160,7 +191,7 @@ export default function GestionTechniciens() {
                 </td>
               </tr>
             ))}
-            {techniciens.length === 0 && (
+            {filtered.length === 0 && (
               <tr><td colSpan={6} className="text-center py-8 text-[var(--color-text-muted)]">{t('admin.empty_technicians')}</td></tr>
             )}
           </tbody>

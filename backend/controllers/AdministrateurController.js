@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator');
 const AdministrateurModel = require('../models/AdministrateurModel');
 const userService = require('../services/userService');
 const demandeService = require('../services/demandeService');
+const { createNotification } = require('../services/notificationService');
 const { respondData, respondMessage, respondNotFound, respondBadRequest } = require('../utils/response');
 
 exports.list = async (req, res, next) => {
@@ -68,6 +69,16 @@ exports.approveDemande = async (req, res, next) => {
     const commentaireAdmin = req.body.commentaireAdmin || '';
     const result = await demandeService.approve(req.params.id, adminId, commentaireAdmin);
 
+    const demande = await demandeService.findDemande(req.params.id);
+    if (demande) {
+      await createNotification(
+        demande.user_id,
+        'Demande approuvée',
+        `Votre demande d'inscription en tant que technicien a été approuvée. ${commentaireAdmin ? 'Commentaire : ' + commentaireAdmin : ''}`,
+        'info'
+      );
+    }
+
     const msg = result.isExistingClient
       ? 'Demande approuvée. Le technicien a été créé. Le compte client existant a été conservé.'
       : 'Demande approuvée. Le compte technicien a été créé.';
@@ -82,6 +93,17 @@ exports.rejectDemande = async (req, res, next) => {
     const adminId = req.user.user_id;
     const commentaireAdmin = req.body.commentaireAdmin || '';
     await demandeService.reject(req.params.id, adminId, commentaireAdmin);
+
+    const demande = await demandeService.findDemande(req.params.id);
+    if (demande) {
+      await createNotification(
+        demande.user_id,
+        'Demande refusée',
+        `Votre demande d'inscription en tant que technicien a été refusée. ${commentaireAdmin ? 'Commentaire : ' + commentaireAdmin : ''}`,
+        'info'
+      );
+    }
+
     respondMessage(res, 'Demande rejetée.');
   } catch (error) {
     next(error);

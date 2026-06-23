@@ -1,6 +1,18 @@
 const db = require('../config/db');
 
 const ServiceModel = {
+  async findAll() {
+    const [rows] = await db.execute(`
+      SELECT s.*, t.nom AS technicien_nom, t.prenom AS technicien_prenom,
+             t.photo_profil AS technicien_photo, c.nom AS categorie_nom
+      FROM services s
+      JOIN techniciens t ON s.technicien_id = t.id
+      JOIN categories c ON s.categorie_id = c.id
+      ORDER BY s.id DESC
+    `);
+    return rows;
+  },
+
   async findAllActive() {
     const [rows] = await db.execute(`
       SELECT s.*, t.nom AS technicien_nom, t.prenom AS technicien_prenom,

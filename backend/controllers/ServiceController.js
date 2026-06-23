@@ -51,6 +51,27 @@ exports.update = async (req, res, next) => {
   }
 };
 
+exports.listAll = async (req, res, next) => {
+  try {
+    const services = await ServiceModel.findAll();
+    respondData(res, services);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.toggleActive = async (req, res, next) => {
+  try {
+    const service = await ServiceModel.findById(req.params.id);
+    if (!service) return respondNotFound(res, 'Service introuvable');
+    const newStatus = service.est_actif ? 0 : 1;
+    await ServiceModel.update(req.params.id, { est_actif: newStatus });
+    respondMessage(res, newStatus ? 'Service activé' : 'Service désactivé');
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.delete = async (req, res, next) => {
   try {
     const service = await ServiceModel.findById(req.params.id);

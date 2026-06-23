@@ -86,9 +86,13 @@ const demandeService = {
     return true;
   },
 
-  async _findDemande(id) {
+  async findDemande(id) {
     const [rows] = await pool.execute('SELECT * FROM demandes_techniciens WHERE id = ?', [id]);
     return rows[0] || null;
+  },
+
+  async _findDemande(id) {
+    return this.findDemande(id);
   },
 
   async _checkClientExists(conn, userId) {

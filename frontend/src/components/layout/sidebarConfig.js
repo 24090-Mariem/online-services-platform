@@ -74,10 +74,8 @@ export const SIDEBAR_CONFIG = {
           { key: "services",      label: "sidebar.services",      icon: "services",    path: ROUTE_MAP.services },
           { key: "categories",    label: "sidebar.categories",    icon: "categories",  path: ROUTE_MAP.categories },
           { key: "reviews",       label: "sidebar.reviews",       icon: "reviews",     path: ROUTE_MAP.reviews },
-          { key: "reports",       label: "sidebar.reports",       icon: "reports",     path: ROUTE_MAP.reports },
           { key: "notifications", label: "sidebar.notifications", icon: "bell", badge: true, path: ROUTE_MAP.notifications },
-          { key: "statistics",    label: "sidebar.statistics",    icon: "stats",       path: ROUTE_MAP.statistics }, 
-          
+          { key: "statistics",    label: "sidebar.statistics",    icon: "stats",       path: ROUTE_MAP.statistics },
         ],
       },
        {
@@ -88,7 +86,6 @@ export const SIDEBAR_CONFIG = {
       },
     ],
     bottom: [
-      { key: "app-settings",label: "sidebar.app_settings",      icon: "settings", path: ROUTE_MAP["app-settings"] }, 
       { key: "logout",      label: "sidebar.logout",     icon: "logout", danger: true, divider: true, path: ROUTE_MAP.logout },
     ],
   },

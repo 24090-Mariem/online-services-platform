@@ -62,7 +62,7 @@ export default function HomePage() {
     nom: '', prenom: '', email: '', telephone: '', specialite: '',
     piece_identite: null, diplome: null, photo_profil: null,
   });
-  const [partnerFileNames, setPartnerFileNames] = useState({ piece_identite: '', diplome: '', photo_profil: '' });
+  const [, setPartnerFileNames] = useState({ piece_identite: '', diplome: '', photo_profil: '' });
   const [partnerLoading, setPartnerLoading] = useState(false);
   const [partnerError, setPartnerError] = useState('');
   const [partnerSuccess, setPartnerSuccess] = useState('');
@@ -106,9 +106,30 @@ export default function HomePage() {
 
   useEffect(() => {
     Promise.all([
-      api.get('/categories').then(r => r.data.data).catch(() => []),
-      api.get('/techniciens').then(r => r.data.data).catch(() => []),
-      api.get('/services').then(r => r.data.data).catch(() => []),
+      api.get('/categories').then(r => {
+        console.log('Response:', r);
+        const p = r.data?.data ?? [];
+        console.log('Data:', p);
+        const list = Array.isArray(p) ? p : (Array.isArray(p?.data) ? p.data : []);
+        console.log('Is Array:', Array.isArray(list));
+        return list;
+      }).catch(() => []),
+      api.get('/techniciens').then(r => {
+        console.log('Response:', r);
+        const p = r.data?.data ?? [];
+        console.log('Data:', p);
+        const list = Array.isArray(p) ? p : (Array.isArray(p?.data) ? p.data : []);
+        console.log('Is Array:', Array.isArray(list));
+        return list;
+      }).catch(() => []),
+      api.get('/services').then(r => {
+        console.log('Response:', r);
+        const p = r.data?.data ?? [];
+        console.log('Data:', p);
+        const list = Array.isArray(p) ? p : (Array.isArray(p?.data) ? p.data : []);
+        console.log('Is Array:', Array.isArray(list));
+        return list;
+      }).catch(() => []),
       api.get('/stats/overview').then(r => r.data.data).catch(() => ({ techniciens: 0, reservations: 0, reviews: 0 })),
     ])
       .then(([cats, techs, svcs, sts]) => {

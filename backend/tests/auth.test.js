@@ -1,4 +1,5 @@
 process.env.CSRF_ENABLED = 'false';
+process.env.COOKIE_SECURE = 'false';
 
 const request = require('supertest');
 const crypto = require('crypto');
@@ -13,12 +14,9 @@ describe('AUTH MODULE TESTS', () => {
   let testEmail;
   const password = "Test1234!";
 
-  // SETUP
   beforeAll(async () => {
     testEmail = `test_${Date.now()}@mail.com`;
-
     await pool.query("DELETE FROM users WHERE email LIKE 'test_%'");
-
     await request(app)
       .post('/api/auth/register')
       .send({
@@ -29,15 +27,9 @@ describe('AUTH MODULE TESTS', () => {
       });
   });
 
-  // CLEANUP
-  afterAll(async () => {
+  afterAll(() => {
     tokenStore.destroy();
-    await pool.end();
   });
-
-  // =========================
-  //  LOGIN
-  // =========================
 
   it('should login and return JWT', async () => {
     const res = await request(app)
@@ -56,10 +48,10 @@ describe('AUTH MODULE TESTS', () => {
     expect(res.statusCode).toBe(401);
   });
 
-  it('should reject invalid JWT', async () => {
+  it('should reject invalid JWT cookie', async () => {
     const res = await request(app)
       .get('/api/auth/me')
-      .set('Authorization', 'Bearer fake_token');
+      .set('Cookie', 'token=fake_token');
 
     expect(res.statusCode).toBe(401);
   });
@@ -74,10 +66,6 @@ describe('AUTH MODULE TESTS', () => {
 
     expect(res.statusCode).toBe(400);
   });
-
-  // =========================
-  //  FORGOT PASSWORD
-  // =========================
 
   it('should generate reset token for valid email', async () => {
     const res = await request(app)
@@ -95,10 +83,6 @@ describe('AUTH MODULE TESTS', () => {
 
     expect(res.statusCode).toBe(200);
   });
-
-  // =========================
-  //  RESET PASSWORD
-  // =========================
 
   it('should reset password with valid token', async () => {
     const rawCode = "123456";
@@ -162,5 +146,4 @@ describe('AUTH MODULE TESTS', () => {
 
     expect(res.statusCode).toBe(400);
   });
-
 });

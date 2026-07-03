@@ -10,6 +10,9 @@ import GestionTechniciens from './GestionTechniciens';
 import GestionDemandes from './GestionDemandes';
 import GestionServices from './GestionServices';
 import Categories from './Categories';
+import Statistiques from './Statistiques';
+import GestionAvis from './GestionAvis';
+import Profil from './Profil';
 import NotificationsPanel from '../../components/notifications/NotificationsPanel';
 
 export default function AdminDashboard() {
@@ -30,7 +33,7 @@ export default function AdminDashboard() {
   return (
     <DashboardLayout
       role="admin"
-      user={{ name: (user?.prenom || '') + ' ' + (user?.nom || ''), role: t('profile.role_admin') }}
+      user={{ name: (user?.prenom || '') + ' ' + (user?.nom || ''), role: t('profile.role_admin'), photo_profil: user?.photo_profil }}
       activePage={getActiveKey(location.pathname)}
       onNavigate={handleNavigate}
     >
@@ -41,6 +44,9 @@ export default function AdminDashboard() {
         <Route path="demandes" element={<GestionDemandes />} />
         <Route path="services" element={<GestionServices />} />
         <Route path="categories" element={<Categories />} />
+        <Route path="statistiques" element={<Statistiques />} />
+        <Route path="avis" element={<GestionAvis />} />
+        <Route path="profil" element={<Profil />} />
         <Route path="notifications" element={<NotificationsPanel />} />
         <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
       </Routes>

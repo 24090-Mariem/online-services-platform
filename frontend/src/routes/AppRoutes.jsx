@@ -5,6 +5,7 @@ import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 import ForgotPassword from '../pages/auth/ForgotPassword';
 import ResetPassword from '../pages/auth/ResetPassword';
+import SetPassword from '../pages/auth/SetPassword';
 import HomePage from '../pages/HomePage';
 import ClientDashboard from '../pages/client/Dashboard';
 import TechnicienDashboard from '../pages/technicien/Dashboard';
@@ -58,6 +59,7 @@ export default function AppRoutes() {
       <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
       <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/set-password" element={<SetPassword />} />
 
       <Route path="/technicien/:id" element={<PublicLayout><PublicTechnicienProfile /></PublicLayout>} />
 

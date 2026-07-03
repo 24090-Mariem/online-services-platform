@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const mysql = require('mysql2/promise');
 require('dotenv').config({
   path: '.env.test'
@@ -16,24 +17,29 @@ require('dotenv').config({
 
     console.log("Connected to DB:", process.env.DB_NAME);
 
-    const sql = fs.readFileSync(
-      './migrations/001_initial_shema.sql',
-      'utf8'
-    );
+    const migrationsDir = path.join(__dirname, '..', 'migrations');
+    const files = fs.readdirSync(migrationsDir)
+      .filter(f => f.endsWith('.sql'))
+      .sort();
 
-    const statements = sql
-      .split(';')
-      .map(s => s.trim())
-      .filter(Boolean);
-
-    for (const statement of statements) {
-      await connection.query(statement);
+    for (const file of files) {
+      const filePath = path.join(migrationsDir, file);
+      console.log(`Running migration: ${file}...`);
+      const sql = fs.readFileSync(filePath, 'utf8');
+      const statements = sql
+        .split(';')
+        .map(s => s.trim())
+        .filter(Boolean);
+      for (const statement of statements) {
+        await connection.query(statement);
+      }
+      console.log(`  ${file} executed successfully`);
     }
 
-    console.log('Migrations executed successfully');
+    console.log('\nAll migrations executed successfully');
 
     const [tables] = await connection.query("SHOW TABLES");
-    console.log("Tables created:", tables);
+    console.log("Tables:", tables.map(t => Object.values(t)[0]).join(', '));
 
     await connection.end();
   } catch (err) {

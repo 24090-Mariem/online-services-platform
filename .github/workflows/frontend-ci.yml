@@ -31,3 +31,6 @@ jobs:
 
       - name: Build project
         run: npm run build
+
+      - name: Lint project
+        run: npm run lint

@@ -3,13 +3,7 @@ const TechnicienModel = require('../models/TechnicienModel');
 const ClientModel = require('../models/ClientModel');
 const ReservationModel = require('../models/ReservationModel');
 const { createNotification } = require('./notificationService');
-
-class AppError extends Error {
-  constructor(statusCode, message) {
-    super(message);
-    this.statusCode = statusCode;
-  }
-}
+const AppError = require('../utils/AppError');
 
 const transitions = {
   accept: {
@@ -37,24 +31,25 @@ const transitions = {
 
 async function transitionStatus(technicienUserId, reservationId, action) {
   const transition = transitions[action];
-  if (!transition) throw new AppError(400, 'Action invalide');
+  if (!transition) throw new AppError('Action invalide', 400);
 
   const tech = await TechnicienModel.findByUserId(technicienUserId);
-  if (!tech) throw new AppError(403, 'Action non autorisée');
+  if (!tech) throw new AppError('Action non autorisée', 403);
 
   const reservation = await ReservationModel.findById(reservationId);
-  if (!reservation) throw new AppError(404, 'Réservation introuvable');
+  if (!reservation) throw new AppError('Réservation introuvable', 404);
 
   const service = await ServiceModel.findById(reservation.service_id);
   if (!service || service.technicien_id !== tech.id) {
-    throw new AppError(403, 'Action non autorisée');
+    throw new AppError('Action non autorisée', 403);
   }
 
   if (reservation.statut !== transition.from) {
-    throw new AppError(400,
+    throw new AppError(
       action === 'complete'
         ? 'Seules les réservations confirmées peuvent être terminées'
-        : 'Cette réservation a déjà été traitée'
+        : 'Cette réservation a déjà été traitée',
+      400
     );
   }
 
@@ -73,4 +68,4 @@ async function transitionStatus(technicienUserId, reservationId, action) {
   return true;
 }
 
-module.exports = { transitionStatus, AppError };
+module.exports = { transitionStatus };

@@ -3,9 +3,20 @@ const bcrypt = require('bcrypt');
 const UserModel = require('../models/UserModel');
 const AppError = require('../utils/AppError');
 
+const NAME_PATTERN = /^[a-zA-ZÀ-ÿa-zA-Z\s\-']+$/;
+const TELEPHONE_PATTERN = /^[+\d][\d\s\-().]{6,20}$/;
+
+const validatePassword = (password) => {
+  if (!password || password.length < 8) throw new AppError('Le mot de passe doit contenir au moins 8 caractères', 400);
+  if (password.length > 128) throw new AppError('Le mot de passe ne doit pas dépasser 128 caractères', 400);
+  if (!/[A-Z]/.test(password)) throw new AppError('Le mot de passe doit contenir une majuscule', 400);
+  if (!/[0-9]/.test(password)) throw new AppError('Le mot de passe doit contenir un chiffre', 400);
+  if (!/[^A-Za-z0-9]/.test(password)) throw new AppError('Le mot de passe doit contenir un caractère spécial', 400);
+};
+
 const userService = {
-  async list(Model) {
-    return await Model.findAll();
+  async list(Model, limit = null, offset = 0) {
+    return await Model.findAll(limit, offset);
   },
 
   async getById(Model, id) {
@@ -33,7 +44,10 @@ const userService = {
     if (!existing) {
       throw new AppError(`${roleLabel} introuvable`, 404);
     }
-    await pool.execute('DELETE FROM users WHERE id = ?', [existing.user_id]);
+    if (existing.is_active === 0) {
+      throw new AppError(`${roleLabel} est déjà désactivé`, 400);
+    }
+    await pool.execute('UPDATE users SET is_active = 0, email = CONCAT("deleted_", id, "_", email) WHERE id = ?', [existing.user_id]);
     return true;
   },
 
@@ -42,6 +56,13 @@ const userService = {
     if (!nom || !email || !password) {
       throw new AppError('Nom, email et mot de passe requis', 400);
     }
+    if (!NAME_PATTERN.test(nom)) {
+      throw new AppError('Le nom contient des caractères non autorisés', 400);
+    }
+    if (nom.length > 100) {
+      throw new AppError('Le nom ne doit pas dépasser 100 caractères', 400);
+    }
+    validatePassword(password);
     const existing = await UserModel.findByEmail(email);
     if (existing) {
       throw new AppError('Cet email est déjà utilisé', 409);
@@ -70,6 +91,19 @@ const userService = {
     if (!nom || !prenom || !email || !password || !specialite) {
       throw new AppError('Nom, prénom, email, mot de passe et spécialité requis', 400);
     }
+    if (!NAME_PATTERN.test(nom) || !NAME_PATTERN.test(prenom)) {
+      throw new AppError('Le nom ou le prénom contient des caractères non autorisés', 400);
+    }
+    if (nom.length > 100 || prenom.length > 100) {
+      throw new AppError('Le nom ou le prénom ne doit pas dépasser 100 caractères', 400);
+    }
+    if (telephone && !TELEPHONE_PATTERN.test(telephone)) {
+      throw new AppError('Format de téléphone invalide', 400);
+    }
+    if (adresse && adresse.length > 255) {
+      throw new AppError('L\'adresse ne doit pas dépasser 255 caractères', 400);
+    }
+    validatePassword(password);
     const existing = await UserModel.findByEmail(email);
     if (existing) {
       throw new AppError('Cet email est déjà utilisé', 409);

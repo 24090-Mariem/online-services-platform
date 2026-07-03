@@ -12,9 +12,13 @@ export function NotificationProvider({ children }) {
     setLoading(true);
     try {
       const res = await api.get('/notifications');
-      const data = res.data?.data || [];
-      setNotifications(data);
-      setUnreadCount(data.filter(n => !n.est_lu).length);
+      console.log('Response:', res);
+      const payload = res.data?.data ?? [];
+      console.log('Data:', payload);
+      const list = Array.isArray(payload) ? payload : (Array.isArray(payload?.data) ? payload.data : []);
+      console.log('Is Array:', Array.isArray(list));
+      setNotifications(list);
+      setUnreadCount(list.filter(n => !n.est_lu).length);
     } catch {
       setNotifications([]);
     } finally {
@@ -62,6 +66,7 @@ export function NotificationProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useNotifications() {
   const context = useContext(NotificationContext);
   if (!context) {

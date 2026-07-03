@@ -6,9 +6,23 @@ const AvisModel = {
     return rows[0].total;
   },
 
+  async findByClient(clientId) {
+    const [rows] = await db.execute(
+      `SELECT a.*, s.titre AS service_titre, t.nom AS technicien_nom, t.prenom AS technicien_prenom
+       FROM avis a
+       JOIN reservations r ON a.reservation_id = r.id
+       JOIN services s ON r.service_id = s.id
+       JOIN techniciens t ON a.technicien_id = t.id
+       WHERE a.client_id = ?
+       ORDER BY a.date_avis DESC`,
+      [clientId]
+    );
+    return rows;
+  },
+
   async findByTechnicien(technicienId) {
     const [rows] = await db.execute(
-      'SELECT * FROM avis WHERE technicien_id = ? ORDER BY created_at DESC',
+      'SELECT * FROM avis WHERE technicien_id = ? ORDER BY date_avis DESC',
       [technicienId]
     );
     return rows;
@@ -25,13 +39,21 @@ const AvisModel = {
 
   async findAll() {
     const [rows] = await db.execute(
-      'SELECT a.*, t.nom AS technicien_nom, t.prenom AS technicien_prenom FROM avis a JOIN techniciens t ON a.technicien_id = t.id ORDER BY a.created_at DESC'
+      'SELECT a.*, t.nom AS technicien_nom, t.prenom AS technicien_prenom FROM avis a JOIN techniciens t ON a.technicien_id = t.id ORDER BY a.date_avis DESC'
     );
     return rows;
   },
 
   async findById(id) {
     const [rows] = await db.execute('SELECT * FROM avis WHERE id = ?', [id]);
+    return rows[0] || null;
+  },
+
+  async findByReservationId(reservationId) {
+    const [rows] = await db.execute(
+      'SELECT * FROM avis WHERE reservation_id = ? LIMIT 1',
+      [reservationId]
+    );
     return rows[0] || null;
   },
 

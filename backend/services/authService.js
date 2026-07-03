@@ -78,13 +78,15 @@ const AuthService = {
 
     await UserModel.updateLastLogin(user.id);
 
+    const fullUser = await UserModel.findById(user.id);
+
     const accessToken = signAccessToken({ id: user.id, role: user.role });
     const refreshToken = await tokenStore.store(user.id);
 
     return {
       accessToken,
       refreshToken,
-      user: sanitizeUser(user),
+      user: sanitizeUser(fullUser),
     };
   },
 
@@ -123,11 +125,9 @@ const AuthService = {
 
   async getMe(userId) {
     const user = await UserModel.findById(userId);
-
-    if (!user) {
-      throw new AppError('Utilisateur non trouvé', 404);
+    if (!user || user.is_active === 0) {
+      throw new AppError('Session expirée, veuillez vous reconnecter', 401);
     }
-
     return sanitizeUser(user);
   },
 

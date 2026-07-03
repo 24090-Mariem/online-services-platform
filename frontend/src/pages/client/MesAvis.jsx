@@ -11,9 +11,13 @@ export default function MesAvis() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await api.get('/avis/mes-avis');
-        const data = res.data.data || [];
-        setAvis(data);
+        const res = await api.get('/reviews/client/mine');
+        console.log('Response:', res);
+        const payload = res.data?.data ?? [];
+        console.log('Data:', payload);
+        const list = Array.isArray(payload) ? payload : (Array.isArray(payload?.data) ? payload.data : []);
+        console.log('Is Array:', Array.isArray(list));
+        setAvis(list);
       } catch {
         toast.error(t('services.loading_error'));
       } finally { setLoading(false); }

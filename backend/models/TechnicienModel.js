@@ -1,14 +1,28 @@
 const pool = require('../config/db');
 
 const TechnicienModel = {
-  async findAll() {
-    const [rows] = await pool.execute(
-      `SELECT t.*, u.email, u.is_active, COALESCE(t.photo_profil, u.photo_profil) AS photo_profil, u.created_at
+  async findAll(limit = null, offset = 0) {
+    let sql = `SELECT t.*, u.email, u.is_active, COALESCE(t.photo_profil, u.photo_profil) AS photo_profil, u.created_at
        FROM techniciens t
        JOIN users u ON u.id = t.user_id
-       ORDER BY t.id DESC`
-    );
+       ORDER BY t.id DESC`;
+    if (limit != null) {
+      const n = Number(limit);
+      if (!Number.isInteger(n) || n < 1) throw new Error('LIMIT must be a positive integer');
+      sql += ` LIMIT ${n}`;
+    }
+    if (offset != null) {
+      const n = Number(offset);
+      if (!Number.isInteger(n) || n < 0) throw new Error('OFFSET must be a non-negative integer');
+      if (n > 0) sql += ` OFFSET ${n}`;
+    }
+    const [rows] = await pool.execute(sql);
     return rows;
+  },
+
+  async countAll() {
+    const [rows] = await pool.execute('SELECT COUNT(*) AS total FROM techniciens');
+    return rows[0].total;
   },
 
   async findById(id) {
@@ -84,6 +98,16 @@ const TechnicienModel = {
     sql += ` ORDER BY t.score DESC, t.nom ASC`;
     const [rows] = await pool.execute(sql, params);
     return rows;
+  },
+
+  async updateScore(technicienId) {
+    const [rows] = await pool.execute(
+      `UPDATE techniciens t
+       SET t.score = (SELECT COALESCE(AVG(a.note), 0) * 10 FROM avis a WHERE a.technicien_id = ?)
+       WHERE t.id = ?`,
+      [technicienId, technicienId]
+    );
+    return rows.affectedRows > 0;
   },
 };
 

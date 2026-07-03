@@ -59,7 +59,6 @@ exports.accept = async (req, res, next) => {
     await reservationService.transitionStatus(req.user.user_id, req.params.id, 'accept');
     respondMessage(res, 'Réservation acceptée');
   } catch (error) {
-    if (error.statusCode) return res.status(error.statusCode).json({ success: false, message: error.message });
     next(error);
   }
 };
@@ -69,7 +68,6 @@ exports.reject = async (req, res, next) => {
     await reservationService.transitionStatus(req.user.user_id, req.params.id, 'reject');
     respondMessage(res, 'Réservation refusée');
   } catch (error) {
-    if (error.statusCode) return res.status(error.statusCode).json({ success: false, message: error.message });
     next(error);
   }
 };
@@ -89,7 +87,6 @@ exports.complete = async (req, res, next) => {
     await reservationService.transitionStatus(req.user.user_id, req.params.id, 'complete');
     respondMessage(res, 'Réservation marquée comme terminée');
   } catch (error) {
-    if (error.statusCode) return res.status(error.statusCode).json({ success: false, message: error.message });
     next(error);
   }
 };

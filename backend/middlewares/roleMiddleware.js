@@ -1,3 +1,5 @@
+// DEPRECATED: Use authorize() from authMiddleware.js instead.
+// Kept for reference - will be removed in a future cleanup.
 const { respondForbidden } = require('../utils/response');
 
 function RoleMiddleware(...allowedRoles) {

@@ -37,4 +37,18 @@ const respondForbidden = (res, message = 'Accès refusé') => {
   return sendError(res, message, 403);
 };
 
-module.exports = { sendSuccess, sendError, respondData, respondMessage, respondNotFound, respondBadRequest, respondForbidden };
+const getPagination = (req, defaultLimit = 20) => {
+  const page = Math.max(1, parseInt(req.query.page) || 1);
+  const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || defaultLimit));
+  const offset = (page - 1) * limit;
+  return { page, limit, offset };
+};
+
+const getPaginationMeta = (page, limit, total) => ({
+  page,
+  limit,
+  total,
+  totalPages: Math.ceil(total / limit),
+});
+
+module.exports = { sendSuccess, sendError, respondData, respondMessage, respondNotFound, respondBadRequest, respondForbidden, getPagination, getPaginationMeta };

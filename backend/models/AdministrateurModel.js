@@ -1,14 +1,28 @@
 const pool = require('../config/db');
 
 const AdministrateurModel = {
-  async findAll() {
-    const [rows] = await pool.execute(
-      `SELECT a.*, u.email, u.is_active, u.created_at
+  async findAll(limit = null, offset = 0) {
+    let sql = `SELECT a.*, u.email, u.is_active, u.created_at
        FROM administrateurs a
        JOIN users u ON u.id = a.user_id
-       ORDER BY a.id DESC`
-    );
+       ORDER BY a.id DESC`;
+    if (limit != null) {
+      const n = Number(limit);
+      if (!Number.isInteger(n) || n < 1) throw new Error('LIMIT must be a positive integer');
+      sql += ` LIMIT ${n}`;
+    }
+    if (offset != null) {
+      const n = Number(offset);
+      if (!Number.isInteger(n) || n < 0) throw new Error('OFFSET must be a non-negative integer');
+      if (n > 0) sql += ` OFFSET ${n}`;
+    }
+    const [rows] = await pool.execute(sql);
     return rows;
+  },
+
+  async countAll() {
+    const [rows] = await pool.execute('SELECT COUNT(*) AS total FROM administrateurs');
+    return rows[0].total;
   },
 
   async findById(id) {

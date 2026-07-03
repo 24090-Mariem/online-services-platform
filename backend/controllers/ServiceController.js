@@ -1,11 +1,13 @@
 const ServiceModel = require('../models/ServiceModel');
 const TechnicienModel = require('../models/TechnicienModel');
-const { respondData, respondMessage, respondNotFound, respondForbidden } = require('../utils/response');
+const { respondData, respondMessage, respondNotFound, respondForbidden, getPagination, getPaginationMeta } = require('../utils/response');
 
 exports.listPublic = async (req, res, next) => {
   try {
-    const services = await ServiceModel.findAllActive();
-    respondData(res, services);
+    const { page, limit, offset } = getPagination(req);
+    const services = await ServiceModel.findAllActive(limit, offset);
+    const total = await ServiceModel.countAllActive();
+    respondData(res, { data: services, pagination: getPaginationMeta(page, limit, total) });
   } catch (error) {
     next(error);
   }
@@ -53,8 +55,10 @@ exports.update = async (req, res, next) => {
 
 exports.listAll = async (req, res, next) => {
   try {
-    const services = await ServiceModel.findAll();
-    respondData(res, services);
+    const { page, limit, offset } = getPagination(req);
+    const services = await ServiceModel.findAll(limit, offset);
+    const total = await ServiceModel.countAll();
+    respondData(res, { data: services, pagination: getPaginationMeta(page, limit, total) });
   } catch (error) {
     next(error);
   }

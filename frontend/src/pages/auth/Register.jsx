@@ -7,6 +7,9 @@ import PasswordField from '../../components/forms/PasswordField';
 import ErrorMessage from '../../components/ui/ErrorMessage';
 import { MailIcon } from '../../components/ui/Icons';
 
+const NAME_PATTERN = /^[a-zA-ZÀ-ÿa-zA-Z\s\-']+$/;
+const TELEPHONE_PATTERN = /^[+\d][\d\s\-().]{6,20}$/;
+
 export default function Register() {
   const { t } = useTranslation();
   const [form, setForm] = useState({
@@ -29,11 +32,19 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
-    if (!form.nom) newErrors.nom = t('auth.name_required');
-    if (!form.prenom) newErrors.prenom = t('auth.firstname_required');
-    if (!form.email) newErrors.email = t('auth.email_required');
+    if (!form.nom.trim()) newErrors.nom = t('auth.name_required');
+    else if (form.nom.length > 100) newErrors.nom = 'Le nom ne doit pas dépasser 100 caractères';
+    else if (!NAME_PATTERN.test(form.nom)) newErrors.nom = 'Le nom contient des caractères non autorisés';
+    if (!form.prenom.trim()) newErrors.prenom = t('auth.firstname_required');
+    else if (form.prenom.length > 100) newErrors.prenom = 'Le prénom ne doit pas dépasser 100 caractères';
+    else if (!NAME_PATTERN.test(form.prenom)) newErrors.prenom = 'Le prénom contient des caractères non autorisés';
+    if (!form.email.trim()) newErrors.email = t('auth.email_required');
+    if (form.telephone && !TELEPHONE_PATTERN.test(form.telephone)) newErrors.telephone = 'Format de téléphone invalide';
     if (!form.password) newErrors.password = t('auth.password_required');
     else if (form.password.length < 8) newErrors.password = t('auth.min_password');
+    else if (!/[A-Z]/.test(form.password)) newErrors.password = 'Le mot de passe doit contenir une majuscule';
+    else if (!/[0-9]/.test(form.password)) newErrors.password = 'Le mot de passe doit contenir un chiffre';
+    else if (!/[^A-Za-z0-9]/.test(form.password)) newErrors.password = 'Le mot de passe doit contenir un caractère spécial';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -122,6 +133,7 @@ export default function Register() {
             placeholder="+212 6XX XXX XXX"
             value={form.telephone}
             onChange={handleChange}
+            error={errors.telephone}
           />
 
           <PasswordField

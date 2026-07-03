@@ -31,9 +31,9 @@ const forgotLimiter = rateLimit({
 });
 
 const resetLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 3,
-  message: { success: false, message: 'Trop de tentatives, réessayez plus tard' },
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message: { success: false, message: 'Trop de tentatives de réinitialisation, réessayez plus tard' },
   standardHeaders: true,
   legacyHeaders: false,
 });

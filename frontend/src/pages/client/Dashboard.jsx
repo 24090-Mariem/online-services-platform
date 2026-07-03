@@ -9,16 +9,10 @@ import MesAvis from './MesAvis';
 import ProfilePage from '../common/ProfilePage';
 
 const DashboardClient = () => {
-  const { user, logout, currentMode, switchMode } = useAuth();
+  const { user, logout, currentMode } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
-
-  const handleSwitchMode = () => {
-    const next = currentMode === 'client' ? 'technicien' : 'client';
-    switchMode(next);
-    navigate(next === 'technicien' ? '/technicien/dashboard' : '/client/dashboard');
-  };
 
   const handleNavigate = async (path) => {
     if (path === ROUTE_MAP.logout) {
@@ -29,12 +23,10 @@ const DashboardClient = () => {
     navigate(path);
   };
 
-  const userRoles = user?.roles || [];
-
   return (
     <DashboardLayout
       role={currentMode || 'client'}
-      user={{ name: user?.prenom + ' ' + user?.nom, role: currentMode === 'technicien' ? t('dashboard.tech_role') : t('dashboard.client_role') }}
+      user={{ name: user?.prenom + ' ' + user?.nom, role: currentMode === 'technicien' ? t('dashboard.tech_role') : t('dashboard.client_role'), photo_profil: user?.photo_profil }}
       activePage={getActiveKey(location.pathname, 'client-dashboard')}
       onNavigate={handleNavigate}
     >

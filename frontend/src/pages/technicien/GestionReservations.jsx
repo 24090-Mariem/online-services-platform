@@ -25,7 +25,12 @@ export default function GestionReservations() {
   const load = async () => {
     try {
       const res = await api.get('/reservations/technicien');
-      setReservations(res.data.data || []);
+      console.log('Response:', res);
+      const payload = res.data?.data ?? [];
+      console.log('Data:', payload);
+      const list = Array.isArray(payload) ? payload : (Array.isArray(payload?.data) ? payload.data : []);
+      console.log('Is Array:', Array.isArray(list));
+      setReservations(list);
     } catch {
       toast.error('Erreur lors du chargement');
     } finally { setLoading(false); }

@@ -8,16 +8,10 @@ import GestionReservations from './GestionReservations';
 import ProfilePage from '../common/ProfilePage';
 
 const DashboardTechnicien = () => {
-  const { user, logout, currentMode, switchMode } = useAuth();
+  const { user, logout, currentMode } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
-
-  const handleSwitchMode = () => {
-    const next = currentMode === 'technicien' ? 'client' : 'technicien';
-    switchMode(next);
-    navigate(next === 'technicien' ? '/technicien/dashboard' : '/client/dashboard');
-  };
 
   const handleNavigate = async (path) => {
     if (path === ROUTE_MAP.logout) {
@@ -28,12 +22,10 @@ const DashboardTechnicien = () => {
     navigate(path);
   };
 
-  const userRoles = user?.roles || [];
-
   return (
     <DashboardLayout
       role={currentMode || 'technicien'}
-      user={{ name: (user?.prenom || '') + ' ' + (user?.nom || ''), role: currentMode === 'client' ? t('dashboard.client_role') : t('dashboard.tech_role') }}
+      user={{ name: (user?.prenom || '') + ' ' + (user?.nom || ''), role: currentMode === 'client' ? t('dashboard.client_role') : t('dashboard.tech_role'), photo_profil: user?.photo_profil }}
       activePage={getActiveKey(location.pathname)}
       onNavigate={handleNavigate}
     >

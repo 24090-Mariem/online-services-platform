@@ -4,12 +4,38 @@ import api from '../../services/api';
 import AdminPageLayout from '../../components/layout/AdminPageLayout';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
+const NAME_PATTERN = /^[a-zA-ZÀ-ÿa-zA-Z\s\-']+$/;
+
 const emptyForm = { nom: '', email: '', password: '' };
+
+const validateForm = (form, editingId) => {
+  const errors = {};
+  const { nom, email, password } = form;
+
+  if (!nom.trim()) errors.nom = 'Le nom est requis';
+  else if (nom.length > 100) errors.nom = 'Le nom ne doit pas dépasser 100 caractères';
+  else if (!NAME_PATTERN.test(nom)) errors.nom = 'Le nom contient des caractères non autorisés';
+
+  if (!email.trim()) errors.email = "L'email est requis";
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = 'Email invalide';
+
+  if (!editingId || password) {
+    if (!password) errors.password = 'Le mot de passe est requis';
+    else if (password.length < 8) errors.password = 'Le mot de passe doit contenir au moins 8 caractères';
+    else if (password.length > 128) errors.password = 'Le mot de passe ne doit pas dépasser 128 caractères';
+    else if (!/[A-Z]/.test(password)) errors.password = 'Le mot de passe doit contenir une majuscule';
+    else if (!/[0-9]/.test(password)) errors.password = 'Le mot de passe doit contenir un chiffre';
+    else if (!/[^A-Za-z0-9]/.test(password)) errors.password = 'Le mot de passe doit contenir un caractère spécial';
+  }
+
+  return errors;
+};
 
 export default function GestionAdministrateurs() {
   const { t } = useTranslation();
   const [admins, setAdmins] = useState([]);
   const [form, setForm] = useState({ ...emptyForm });
+  const [errors, setErrors] = useState({});
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -20,27 +46,36 @@ export default function GestionAdministrateurs() {
     setTimeout(() => setMessage({ type: '', text: '' }), 3000);
   };
 
-  const load = async () => {
-    setLoading(true);
-    try {
-      const res = await api.get('/administrateurs');
-      setAdmins(res.data.data || []);
-    } catch {
-      showMessage('error', t('admin.load_error_generic'));
-    } finally {
-      setLoading(false);
-    }
-  };
+const load = async () => {
+  setLoading(true);
+  try {
+    const res = await api.get('/administrateurs');
+    console.log('Response:', res);
+    const payload = res.data?.data ?? [];
+    console.log('Data:', payload);
+    const list = Array.isArray(payload) ? payload : (Array.isArray(payload?.data) ? payload.data : []);
+    console.log('Is Array:', Array.isArray(list));
+    setAdmins(list);
+  } catch {
+    showMessage('error', t('admin.load_error_generic'));
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     (async () => { await load(); })();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const resetForm = () => { setForm({ ...emptyForm }); setEditingId(null); };
+  const resetForm = () => { setForm({ ...emptyForm }); setEditingId(null); setErrors({}); };
 
   const handleSubmit = async e => {
     e.preventDefault();
+    const validationErrors = validateForm(form, editingId);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
     setSubmitting(true);
     try {
       if (editingId) {
@@ -61,6 +96,7 @@ export default function GestionAdministrateurs() {
   const handleEdit = (admin) => {
     setForm({ nom: admin.nom, email: admin.email, password: '' });
     setEditingId(admin.id);
+    setErrors({});
   };
 
   const handleDelete = async (id) => {
@@ -72,6 +108,7 @@ export default function GestionAdministrateurs() {
   };
 
   const inputClass = "py-[11px] px-3 border-[1.5px] border-[var(--color-border)] rounded-[var(--radius-md)] font-body text-sm text-[var(--color-text)] bg-[var(--color-surface)]";
+  const inputErrorClass = "py-[11px] px-3 border-[1.5px] border-[var(--color-error)] rounded-[var(--radius-md)] font-body text-sm text-[var(--color-text)] bg-[var(--color-surface)]";
 
   if (loading) return <AdminPageLayout title={t('admin.administrators_title')}><LoadingSpinner /></AdminPageLayout>;
 
@@ -83,10 +120,19 @@ export default function GestionAdministrateurs() {
         </div>
       )}
       <form onSubmit={handleSubmit} className="mb-6">
-        <div className="flex gap-3 items-end flex-wrap">
-          <input name="nom" placeholder={t('profile.label_nom') + ' *'} value={form.nom} onChange={e => setForm(p => ({ ...p, [e.target.name]: e.target.value }))} required className={inputClass} />
-          <input name="email" type="email" placeholder={t('profile.label_email') + ' *'} value={form.email} onChange={e => setForm(p => ({ ...p, [e.target.name]: e.target.value }))} required className={inputClass} />
-          <input name="password" type="password" placeholder={editingId ? t('admin.new_password') : 'Mot de passe *'} value={form.password} onChange={e => setForm(p => ({ ...p, [e.target.name]: e.target.value }))} required={!editingId} className={inputClass} />
+        <div className="flex flex-wrap gap-3 items-start">
+          <div className="flex flex-col flex-1 min-w-[250px]">
+            <input name="nom" placeholder={t('profile.label_nom') + ' *'} value={form.nom} onChange={e => { setForm(p => ({ ...p, [e.target.name]: e.target.value })); setErrors(p => ({ ...p, [e.target.name]: '' })); }} required className={`${errors.nom ? inputErrorClass : inputClass} w-full`} />
+            {errors.nom && <span className="text-xs text-[var(--color-error)]">{errors.nom}</span>}
+          </div>
+          <div className="flex flex-col flex-1 min-w-[250px]">
+            <input name="email" type="email" placeholder={t('profile.label_email') + ' *'} value={form.email} onChange={e => { setForm(p => ({ ...p, [e.target.name]: e.target.value })); setErrors(p => ({ ...p, [e.target.name]: '' })); }} required className={`${errors.email ? inputErrorClass : inputClass} w-full`} />
+            {errors.email && <span className="text-xs text-[var(--color-error)]">{errors.email}</span>}
+          </div>
+          <div className="flex flex-col flex-1 min-w-[250px]">
+            <input name="password" type="password" placeholder={editingId ? t('admin.new_password') : 'Mot de passe *'} value={form.password} onChange={e => { setForm(p => ({ ...p, [e.target.name]: e.target.value })); setErrors(p => ({ ...p, [e.target.name]: '' })); }} required={!editingId} className={`${errors.password ? inputErrorClass : inputClass} w-full`} />
+            {errors.password && <span className="text-xs text-[var(--color-error)]">{errors.password}</span>}
+          </div>
           <button type="submit" disabled={submitting}
             className="py-[11px] px-5 bg-[var(--color-primary)] text-white border-none rounded-[var(--radius-md)] font-body text-sm font-semibold cursor-pointer whitespace-nowrap disabled:opacity-50">
             {submitting ? t('admin.loading') : editingId ? t('admin.edit') : t('admin.add')}
@@ -101,21 +147,24 @@ export default function GestionAdministrateurs() {
       </form>
 
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-[var(--text-xs)]">
+        <table className="min-w-[700px] w-full border-collapse text-[var(--text-xs)]">
           <thead>
-            <tr><th className="text-left p-2">{t('profile.label_nom')}</th><th className="text-left p-2">{t('profile.label_email')}</th><th className="text-left p-2">{t('admin.role_col')}</th><th className="text-left p-2">{t('admin.actions_col')}</th></tr>
+            <tr className="border-b border-[var(--color-border)]"><th className="text-left p-2">{t('profile.label_nom')}</th><th className="text-left p-2">{t('profile.label_email')}</th><th className="text-left p-2">{t('admin.actions_col')}</th></tr>
           </thead>
           <tbody>
             {admins.map(a => (
               <tr key={a.id} className="border-t border-[var(--color-border)]">
                 <td className="p-2">{a.nom}</td>
                 <td className="p-2">{a.email}</td>
-                <td className="p-2">{a.role}</td>
+                 
                 <td className="p-2">
+                  <div className="flex flex-wrap gap-2">
+
                   <button onClick={() => handleEdit(a)}
                     className="py-[6px] px-4 bg-[var(--color-primary)] text-white border-none rounded-[var(--radius-sm)] font-body text-[var(--text-xs)] cursor-pointer mr-1">{t('admin.edit')}</button>
                   <button onClick={() => handleDelete(a.id)}
                     className="py-[6px] px-3 bg-[var(--color-error)] text-white border-none rounded-[var(--radius-sm)] font-body text-[var(--text-xs)] cursor-pointer">{t('admin.delete')}</button>
+                </div>
                 </td>
               </tr>
             ))}

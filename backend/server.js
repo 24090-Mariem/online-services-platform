@@ -1,5 +1,9 @@
 require('dotenv').config();
 
+if (process.env.NODE_ENV === 'production' && process.env.CSRF_ENABLED !== 'false') {
+  process.env.CSRF_ENABLED = 'true';
+}
+
 const requiredEnv = ['JWT_SECRET', 'CLIENT_URL'];
 for (const key of requiredEnv) {
   if (!process.env[key]) {
@@ -31,7 +35,7 @@ const statsRoutes = require('./routes/statsRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const userRoutes = require('./routes/userRoutes');
 const errorHandler = require('./middlewares/errorMiddleware');
-const path = require('path');
+const uploadStaticMiddleware = require('./middlewares/uploadStaticMiddleware');
 
 const app = express();
 
@@ -41,11 +45,11 @@ app.use(cors({
   credentials: true,
 }));
 app.use(morgan('dev'));
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: '1mb' }));
 app.use(cookieParser());
 app.use(csrfProtection);
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', uploadStaticMiddleware);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/administrateurs', adminRoutes);

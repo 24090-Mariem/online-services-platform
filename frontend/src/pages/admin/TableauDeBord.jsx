@@ -1,21 +1,38 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import api from '../../services/api';
 import AdminPageLayout from '../../components/layout/AdminPageLayout';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
 export default function TableauDeBord() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await api.get('/stats/overview');
+        setStats(res.data.data);
+      } catch {
+        setStats({ techniciens: 0, reservations: 0, reviews: 0 });
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
   const handleLogout = async () => {
     await logout();
-    navigate('/staff/login');
+    navigate('/login');
   };
 
-  const stats = [
-    { label: 'Techniciens', value: '12', color: 'var(--color-primary)' },
-    { label: 'Clients', value: '48', color: 'var(--color-success)' },
-    { label: 'Services', value: '8', color: 'var(--color-warning)' },
-    { label: 'Demandes', value: '23', color: 'var(--color-error)' },
+  const cards = [
+    { label: 'Techniciens vérifiés', value: stats?.techniciens ?? '—', color: 'var(--color-primary)' },
+    { label: 'Réservations', value: stats?.reservations ?? '—', color: 'var(--color-success)' },
+    { label: 'Avis', value: stats?.reviews ?? '—', color: 'var(--color-warning)' },
   ];
 
   return (
@@ -33,18 +50,22 @@ export default function TableauDeBord() {
           Déconnexion
         </button>
       </div>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4">
-        {stats.map((s, i) => (
-          <div
-            key={i}
-            className="bg-[var(--color-surface)] rounded-[var(--radius-md)] p-5 flex flex-col gap-1"
-            style={{ borderTop: `3px solid ${s.color}` }}
-          >
-            <span className="text-[var(--text-2xl)] font-bold text-[var(--color-text)]">{s.value}</span>
-            <span className="text-sm text-[var(--color-text-secondary)]">{s.label}</span>
-          </div>
-        ))}
-      </div>
+      {loading ? (
+        <LoadingSpinner />
+      ) : (
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4">
+          {cards.map((s) => (
+            <div
+              key={s.label}
+              className="bg-[var(--color-surface)] rounded-[var(--radius-md)] p-5 flex flex-col gap-1"
+              style={{ borderTop: `3px solid ${s.color}` }}
+            >
+              <span className="text-[var(--text-2xl)] font-bold text-[var(--color-text)]">{s.value}</span>
+              <span className="text-sm text-[var(--color-text-secondary)]">{s.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </AdminPageLayout>
   );
 }

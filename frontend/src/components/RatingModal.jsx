@@ -11,7 +11,7 @@ export default function RatingModal({ reservation, onClose, onRated }) {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await api.post('/avis', { reservation_id: reservation.id, note, commentaire });
+      await api.post('/reviews', { reservation_id: reservation.id, technicien_id: reservation.technicien_id, note, commentaire });
       toast.success('Avis envoyé');
       onRated(reservation.id);
       onClose();

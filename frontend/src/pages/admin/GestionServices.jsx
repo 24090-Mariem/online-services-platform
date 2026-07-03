@@ -20,7 +20,12 @@ export default function GestionServices() {
     setLoading(true);
     try {
       const res = await api.get('/services/all');
-      setServices(res.data.data || []);
+      console.log('Response:', res);
+      const payload = res.data?.data ?? [];
+      console.log('Data:', payload);
+      const list = Array.isArray(payload) ? payload : (Array.isArray(payload?.data) ? payload.data : []);
+      console.log('Is Array:', Array.isArray(list));
+      setServices(list);
     } catch {
       showMessage('error', t('admin.load_error'));
     } finally { setLoading(false); }

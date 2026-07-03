@@ -29,9 +29,13 @@ export default function MesReservations() {
     (async () => {
       try {
         const res = await api.get('/reservations/mine');
-        const data = res.data.data || [];
-        setReservations(data);
-        setRatedIds(new Set(data.filter(r => r.avis_id).map(r => r.id)));
+        console.log('Response:', res);
+        const payload = res.data?.data ?? [];
+        console.log('Data:', payload);
+        const list = Array.isArray(payload) ? payload : (Array.isArray(payload?.data) ? payload.data : []);
+        console.log('Is Array:', Array.isArray(list));
+        setReservations(list);
+        setRatedIds(new Set(list.filter(r => r.avis_id).map(r => r.id)));
       } catch {
         toast.error('Erreur lors du chargement');
       } finally { setLoading(false); }

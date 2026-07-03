@@ -175,7 +175,16 @@
     "reset_code_required": "6-digit code required",
     "reset_password_mismatch": "Passwords do not match",
     "reset_error": "Error resetting password",
-    "send_code_again": "Send code again"
+    "send_code_again": "Send code again",
+    "set_password_title": "Create your password",
+    "set_password_submit": "Create my password",
+    "set_password_loading": "Creating...",
+    "set_password_success": "Password created successfully",
+    "set_password_success_text": "You can now log in with your password.",
+    "invalid_link": "Invalid link",
+    "invalid_link_text": "This link is invalid or has expired.",
+    "new_password": "New password",
+    "confirm_password": "Confirm password"
   },
   "profile": {
     "title": "My Profile",
@@ -340,7 +349,10 @@
     "empty_services": "No services",
     "service_toggled": "Service status changed",
     "deactivate": "Deactivate",
-    "activate": "Activate"
+    "activate": "Activate",
+    "reject_title": "Reject request",
+    "reject_comment_placeholder": "Comment (optional)...",
+    "confirm_reject": "Confirm rejection"
   },
   "language": {
     "fr": "Français",

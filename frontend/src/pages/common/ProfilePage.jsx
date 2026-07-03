@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import api from '../../services/api';
 import { useAuth } from '../../hooks/useAuth';
+import { getUploadUrl } from '../../utils/uploads';
 
 export default function ProfilePage() {
   const { user, setUser } = useAuth();
@@ -45,7 +46,8 @@ export default function ProfilePage() {
     fd.append('avatar', file);
     try {
       const res = await api.post('/users/profile/avatar', fd);
-      if (setUser) setUser(res.data.data?.user);
+      const updatedUser = res.data.data?.user;
+      if (setUser && updatedUser) setUser(updatedUser);
       toast.success(t('profile.photo_updated'));
     } catch (err) {
       toast.error(err.response?.data?.message || t('profile.update_error'));
@@ -54,7 +56,7 @@ export default function ProfilePage() {
 
   const roles = user?.roles || [];
   const roleLabel = roles.includes('admin') ? t('profile.role_admin') : roles.includes('technicien') ? t('profile.role_technician') : t('profile.role_client');
-  const avatarSrc = user?.photo_profil ? `/uploads/${user.photo_profil}` : null;
+  const avatarSrc = getUploadUrl(user?.photo_profil);
 
   return (
     <div className="max-w-[800px] mx-auto">

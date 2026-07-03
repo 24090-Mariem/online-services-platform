@@ -175,7 +175,16 @@
     "reset_code_required": "رمز مكون من 6 أرقام مطلوب",
     "reset_password_mismatch": "كلمتا المرور غير متطابقتين",
     "reset_error": "خطأ في إعادة تعيين كلمة المرور",
-    "send_code_again": "إعادة إرسال الرمز"
+    "send_code_again": "إعادة إرسال الرمز",
+    "set_password_title": "إنشاء كلمة المرور",
+    "set_password_submit": "إنشاء كلمة المرور",
+    "set_password_loading": "جارٍ الإنشاء...",
+    "set_password_success": "تم إنشاء كلمة المرور بنجاح",
+    "set_password_success_text": "يمكنك الآن تسجيل الدخول بكلمة المرور الخاصة بك.",
+    "invalid_link": "رابط غير صالح",
+    "invalid_link_text": "هذا الرابط غير صالح أو منتهي الصلاحية.",
+    "new_password": "كلمة المرور الجديدة",
+    "confirm_password": "تأكيد كلمة المرور"
   },
   "profile": {
     "title": "ملفي الشخصي",
@@ -340,7 +349,10 @@
     "empty_services": "لا توجد خدمات",
     "service_toggled": "تم تغيير حالة الخدمة",
     "deactivate": "تعطيل",
-    "activate": "تفعيل"
+    "activate": "تفعيل",
+    "reject_title": "رفض الطلب",
+    "reject_comment_placeholder": "تعليق (اختياري)...",
+    "confirm_reject": "تأكيد الرفض"
   },
   "language": {
     "fr": "Français",

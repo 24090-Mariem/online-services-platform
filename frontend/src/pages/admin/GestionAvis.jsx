@@ -51,8 +51,8 @@ export default function GestionAvis() {
             <thead>
               <tr>
                 <th className="text-left p-2">{t('reservations.technician_label')}</th>
-                <th className="text-left p-2">{t('reviews.note', 'Note')}</th>
-                <th className="text-left p-2">{t('reviews.comment', 'Commentaire')}</th>
+                <th className="text-left p-2">{t('reviews.note')}</th>
+                <th className="text-left p-2">{t('reviews.comment')}</th>
                 <th className="text-left p-2">{t('admin.date_col')}</th>
               </tr>
             </thead>

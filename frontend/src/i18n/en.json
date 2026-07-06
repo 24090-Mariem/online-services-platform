@@ -89,6 +89,18 @@
     "partner_submit": "Submit my request",
     "partner_submitting": "Submitting..."
   },
+  "reviews": {
+    "title": "Reviews",
+    "my_title": "My Reviews",
+    "loading": "Loading...",
+    "empty_title": "No reviews yet",
+    "empty_subtitle": "You will see your reviews here once you receive them.",
+    "technician_label": "Technician",
+    "client_label": "Client",
+    "note": "Rating",
+    "comment": "Comment",
+    "date_col": "Date"
+  },
   "auth": {
     "login_title": "Log in",
     "login_submit": "Log in",
@@ -226,7 +238,10 @@
     "mark_complete": "Mark as completed",
     "rate": "Rate this service",
     "already_rated": "Already rated",
-    "error": "Error"
+    "error": "Error",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "book_title": "Service reservation"
   },
   "services": {
     "my_title": "My Services",
@@ -352,7 +367,16 @@
     "activate": "Activate",
     "reject_title": "Reject request",
     "reject_comment_placeholder": "Comment (optional)...",
-    "confirm_reject": "Confirm rejection"
+    "confirm_reject": "Confirm rejection",
+    "view_docs": "View",
+    "hide_docs": "Hide",  
+    "actions": "Actions",
+    "confirm_approve": "Confirm approval",
+    "reports_title": "Manage Reports" ,
+    "report_resolved": "Report resolved",
+    "report_unresolved": "Report unresolved",
+    "resolve": "Resolve", 
+    "label_docs": "Documents"
   },
   "language": {
     "fr": "Français",

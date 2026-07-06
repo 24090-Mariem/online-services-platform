@@ -226,7 +226,10 @@
     "mark_complete": "Marquer comme terminée",
     "rate": "Noter ce service",
     "already_rated": "Déjà noté",
-    "error": "Erreur"
+    "error": "Erreur",
+     "confirm": "Réserver",
+     "cancel": "Annuler",
+     "book_title": "Reservation du service"
   },
   "services": {
     "my_title": "Mes Services",
@@ -296,6 +299,21 @@
     "tab_read": "Lues",
     "delete_all": "Supprimer"
   },
+  "reviews": {
+    "my_title": "Mes Avis",
+    "manage_title": "Gestion des Avis",
+    "loading": "Chargement...",
+    "empty_title": "Aucun avis pour le moment",
+    "empty_subtitle": "Vous recevrez des avis de vos clients après chaque service",
+    "technician_label": "Technicien",
+    "client_label": "Client",
+    "category_label": "Catégorie",
+    "note": "Note",
+    "comment": "Commentaire",
+    "date_col": "Date",
+    "no_comment": "Aucun commentaire",
+    "error": "Erreur lors du chargement des avis"
+  },
   "admin": {
     "categories_title": "Gestion des catégories",
     "category_name": "Nom de la catégorie *",
@@ -352,7 +370,23 @@
     "activate": "Activer",
     "reject_title": "Refuser la demande",
     "reject_comment_placeholder": "Commentaire (optionnel)...",
-    "confirm_reject": "Confirmer le refus"
+    "confirm_reject": "Confirmer le refus",
+    "confirm_approve": "Confirmer l'approbation",
+    "reports_title": "Gestion des signalements",
+    "view_docs": "Voir",
+    "hide_docs": "Masquer",
+    "actions": "Actions",
+    "report_resolved": "Signalement résolu",
+    "report_unresolved": "Signalement non résolu",
+    "report_resolve": "Résoudre",
+    "report_unresolve": "Marquer comme non résolu",
+    "report_delete": "Supprimer le signalement",
+    "report_delete_confirm": "Êtes-vous sûr de vouloir supprimer ce signalement ?",
+    "report_delete_success": "Signalement supprimé",
+    "report_delete_error": "Erreur lors de la suppression du signalement",
+    "report_resolve_success": "Signalement résolu",
+    "label_docs": "Documents"
+     
   },
   "language": {
     "fr": "Français",

@@ -226,7 +226,11 @@
     "mark_complete": "تحديد كمكتملة",
     "rate": "تقييم هذه الخدمة",
     "already_rated": "تم التقييم",
-    "error": "خطأ"
+    "error": "خطأ",
+    "confirm": "تأكيد الحجز",
+    "cancel": "إلغاء",
+    "book_title": "حجز الخدمة"
+
   },
   "services": {
     "my_title": "خدماتي",
@@ -352,7 +356,23 @@
     "activate": "تفعيل",
     "reject_title": "رفض الطلب",
     "reject_comment_placeholder": "تعليق (اختياري)...",
-    "confirm_reject": "تأكيد الرفض"
+    "confirm_reject": "تأكيد الرفض",
+    "confirm_approve": "تأكيد القبول",
+    "reports_title": "إدارة البلاغات",
+    "view_docs": "عرض",
+    "hide_docs": "إخفاء",
+    "actions": "الإجراءات",
+    "label_docs": "الوثائق",
+    "report_resolved": "تم حل البلاغ"
+  },
+  "reviews": {
+    "note": "التقييم",
+    "comment": "التعليق",
+    "empty": "لا توجد تقييمات",
+    "empty_title": "لا توجد تقييمات", 
+    "empty_subtitle": "ستظهر التقييمات بعد إتمام الحجوزات",
+    "loading": "جارٍ التحميل..."
+    
   },
   "language": {
     "fr": "Français",

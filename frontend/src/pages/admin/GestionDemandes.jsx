@@ -138,7 +138,7 @@ export default function GestionDemandes() {
                 <th className="text-left p-2">{t('profile.label_specialite')}</th>
                 <th className="text-left p-2">{t('admin.status_col')}</th>
                 <th className="text-left p-2">{t('admin.date_col')}</th>
-                <th className="text-left p-2">Documents</th>
+                <th className="text-left p-2">{t('admin.label_docs')}</th>
                 <th className="text-left p-2">{t('admin.actions')}</th>
               </tr>
             </thead>

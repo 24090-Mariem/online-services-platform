@@ -1,51 +1,16 @@
 const { Router } = require('express');
-const rateLimit = require('express-rate-limit');
+const {
+  authLimiter,
+  refreshLimiter,
+  forgotLimiter,
+  resetLimiter,
+  generalLimiter,
+} = require('../middlewares/rateLimiter');
 const {
   register, login, refresh, logout, getMe, forgotPassword, resetPassword,
 } = require('../controllers/authController');
 const { registerRules, loginRules, forgotPasswordRules, resetPasswordRules, validate } = require('../validations/authValidator');
 const { protect } = require('../middlewares/authMiddleware');
-
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  message: { success: false, message: 'Trop de tentatives, réessayez plus tard' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-const refreshLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  message: { success: false, message: 'Trop de tentatives' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-const forgotLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  message: { success: false, message: 'Trop de tentatives, réessayez plus tard' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-const resetLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 5,
-  message: { success: false, message: 'Trop de tentatives de réinitialisation, réessayez plus tard' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-const generalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 30,
-  message: { success: false, message: 'Trop de tentatives, réessayez plus tard' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
 const router = Router();
 
 router.post('/register', authLimiter, registerRules, validate, register);

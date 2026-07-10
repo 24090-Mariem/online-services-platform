@@ -6,13 +6,14 @@ import Register from '../pages/auth/Register';
 import ForgotPassword from '../pages/auth/ForgotPassword';
 import ResetPassword from '../pages/auth/ResetPassword';
 import SetPassword from '../pages/auth/SetPassword';
-import HomePage from '../pages/HomePage';
 import ClientDashboard from '../pages/client/Dashboard';
 import TechnicienDashboard from '../pages/technicien/Dashboard';
 import AdminDashboard from '../pages/admin/Dashboard';
 import PublicLayout from '../components/layout/PublicLayout';
 import NotificationsPage from '../pages/common/NotificationsPage';
 import PublicTechnicienProfile from '../pages/common/PublicTechnicienProfile';
+import AllTechniciens from '../pages/client/AllTechniciens';
+import AllServices from '../pages/client/AllServices';
 
 function LoadingScreen() {
   return (
@@ -61,7 +62,9 @@ export default function AppRoutes() {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/set-password" element={<SetPassword />} />
 
-      <Route path="/technicien/:id" element={<PublicLayout><PublicTechnicienProfile /></PublicLayout>} />
+      <Route path="/technicien/:id" element={<PublicTechnicienProfile />} />
+      <Route path="/techniciens" element={<AllTechniciens />} />
+      <Route path="/services" element={<AllServices />} />
 
       <Route path="/notifications" element={
         <ProtectedRoute>
@@ -72,7 +75,7 @@ export default function AppRoutes() {
       <Route path="/" element={
         <PublicHomeRoute>
           <PublicLayout>
-            <HomePage />
+            <Login/>
           </PublicLayout>
         </PublicHomeRoute>
       } />

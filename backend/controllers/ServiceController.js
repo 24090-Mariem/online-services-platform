@@ -53,6 +53,27 @@ exports.update = async (req, res, next) => {
   }
 };
 
+exports.search = async (req, res, next) => {
+  try {
+    const { q, categorie_id, ville, prix_min, prix_max, page, limit } = req.query;
+    const pagination = getPagination({ query: { page, limit } });
+    const filters = {
+      q,
+      categorie_id: categorie_id || null,
+      ville,
+      prix_min: prix_min != null ? Number(prix_min) : null,
+      prix_max: prix_max != null ? Number(prix_max) : null,
+      limit: pagination.limit,
+      offset: pagination.offset,
+    };
+    const services = await ServiceModel.search(filters);
+    const total = await ServiceModel.countSearch(filters);
+    respondData(res, { data: services, pagination: getPaginationMeta(pagination.page, pagination.limit, total) });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.listAll = async (req, res, next) => {
   try {
     const { page, limit, offset } = getPagination(req);

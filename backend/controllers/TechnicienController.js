@@ -1,5 +1,7 @@
 const { validationResult } = require('express-validator');
 const TechnicienModel = require('../models/TechnicienModel');
+const GalerieModel = require('../models/GalerieModel');
+const AvisModel = require('../models/AvisModel');
 const userService = require('../services/userService');
 const demandeService = require('../services/demandeService');
 const upload = require('../config/upload');
@@ -100,7 +102,15 @@ exports.getPublicProfile = async (req, res, next) => {
   try {
     const technicien = await TechnicienModel.findById(req.params.id);
     if (!technicien || !technicien.est_verifie) return respondNotFound(res, 'Technicien introuvable');
-    respondData(res, technicien);
+
+    const galerie = await GalerieModel.findCompletedByTechnicien(technicien.id);
+    const avis = await AvisModel.findByTechnicien(technicien.id);
+
+    respondData(res, {
+      technicien,
+      galerie,
+      avis,
+    });
   } catch (error) {
     next(error);
   }

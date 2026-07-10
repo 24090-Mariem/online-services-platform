@@ -8,12 +8,13 @@ const csrfProtection = (req, res, next) => {
     return next();
   }
 
+  // 🟢 GET requests → only ensure token exists
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
     if (!req.cookies[COOKIE_NAME]) {
       res.cookie(COOKIE_NAME, crypto.randomBytes(32).toString('hex'), {
         httpOnly: false,
         secure: process.env.COOKIE_SECURE === 'true',
-        sameSite: 'strict',
+        sameSite: 'lax',
         maxAge: 24 * 60 * 60 * 1000,
         path: '/',
       });
@@ -21,8 +22,12 @@ const csrfProtection = (req, res, next) => {
     return next();
   }
 
+  // 🟡 FIX: normalize header access
   const cookieToken = req.cookies[COOKIE_NAME];
-  const headerToken = req.headers[HEADER_NAME];
+  const headerToken = req.headers[HEADER_NAME.toLowerCase()];
+
+  // 🟡 DEBUG SAFE (optionnel)
+  console.log("CSRF:", req.method, req.path);
 
   if (!cookieToken || !headerToken || cookieToken !== headerToken) {
     return res.status(403).json({

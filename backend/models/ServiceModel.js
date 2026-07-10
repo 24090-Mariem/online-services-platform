@@ -101,6 +101,91 @@ const ServiceModel = {
   async delete(id) {
     const [result] = await db.execute('DELETE FROM services WHERE id = ?', [id]);
     return result.affectedRows > 0;
+  },
+
+  async search(filters = {}) {
+    const { q, categorie_id, ville, prix_min, prix_max, limit, offset } = filters;
+    let sql = `
+      SELECT s.*, t.nom AS technicien_nom, t.prenom AS technicien_prenom,
+             t.photo_profil AS technicien_photo, t.adresse AS technicien_adresse,
+             t.score AS technicien_score, c.nom AS categorie_nom
+      FROM services s
+      JOIN techniciens t ON s.technicien_id = t.id
+      JOIN categories c ON s.categorie_id = c.id
+      WHERE s.est_actif = 1
+    `;
+    const params = [];
+
+    if (q) {
+      sql += ` AND s.titre LIKE ?`;
+      params.push(`%${q}%`);
+    }
+    if (categorie_id) {
+      sql += ` AND s.categorie_id = ?`;
+      params.push(categorie_id);
+    }
+    if (ville) {
+      sql += ` AND t.adresse LIKE ?`;
+      params.push(`%${ville}%`);
+    }
+    if (prix_min != null) {
+      sql += ` AND s.prix >= ?`;
+      params.push(prix_min);
+    }
+    if (prix_max != null) {
+      sql += ` AND s.prix <= ?`;
+      params.push(prix_max);
+    }
+
+    sql += ` ORDER BY s.id DESC`;
+
+    const nLimit = limit != null ? Number(limit) : null;
+    const nOffset = offset != null ? Number(offset) : null;
+    if (nLimit != null && Number.isInteger(nLimit) && nLimit > 0) {
+      sql += ` LIMIT ${nLimit}`;
+    }
+    if (nOffset != null && Number.isInteger(nOffset) && nOffset > 0) {
+      sql += ` OFFSET ${nOffset}`;
+    }
+
+    const [rows] = await db.execute(sql, params);
+    return rows;
+  },
+
+  async countSearch(filters = {}) {
+    const { q, categorie_id, ville, prix_min, prix_max } = filters;
+    let sql = `
+      SELECT COUNT(*) AS total
+      FROM services s
+      JOIN techniciens t ON s.technicien_id = t.id
+      JOIN categories c ON s.categorie_id = c.id
+      WHERE s.est_actif = 1
+    `;
+    const params = [];
+
+    if (q) {
+      sql += ` AND s.titre LIKE ?`;
+      params.push(`%${q}%`);
+    }
+    if (categorie_id) {
+      sql += ` AND s.categorie_id = ?`;
+      params.push(categorie_id);
+    }
+    if (ville) {
+      sql += ` AND t.adresse LIKE ?`;
+      params.push(`%${ville}%`);
+    }
+    if (prix_min != null) {
+      sql += ` AND s.prix >= ?`;
+      params.push(prix_min);
+    }
+    if (prix_max != null) {
+      sql += ` AND s.prix <= ?`;
+      params.push(prix_max);
+    }
+
+    const [rows] = await db.execute(sql, params);
+    return rows[0].total;
   }
 };
 

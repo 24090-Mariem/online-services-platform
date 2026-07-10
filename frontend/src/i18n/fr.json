@@ -15,7 +15,8 @@
     "switch_mode": "Changer de mode",
     "search_placeholder": "Rechercher...",
     "default_user": "Utilisateur",
-    "default_role": "Administrateur"
+    "default_role": "Administrateur",
+    "back_home": "Accueil"
   },
   "public_nav": {
     "dashboard": "Tableau de bord",
@@ -71,6 +72,10 @@
     "stats_reviews": "Avis clients",
     "cta_title": "Vous êtes un technicien ?",
     "cta_subtitle": "Rejoignez notre réseau de professionnels certifiés et développez votre activité. Inscription gratuite, commission parmi les plus basses du marché.",
+    "all_categories": "Toutes les catégories",
+    "view_all_services": "Tous les services",
+    "view_all_technicians": "Tous les techniciens",
+    "no_results": "Aucun résultat trouvé",
     "cta_close": "Fermer",
     "cta_button": "Devenir partenaire",
     "partner_title": "Devenir partenaire",
@@ -387,6 +392,20 @@
     "report_resolve_success": "Signalement résolu",
     "label_docs": "Documents"
      
+  },
+  "technicien_profile": {
+    "title": "Profil du technicien",
+    "specialite": "Spécialité",
+    "score": "Score",
+    "avis_label": "Avis",
+    "no_avis": "Aucun avis pour le moment",
+    "gallery_title": "Galerie des réalisations",
+    "no_gallery": "Aucune réalisation en galerie pour le moment",
+    "completed_on": "Terminé le",
+    "note_label": "Note",
+    "back_to_home": "Retour à l'accueil",
+    "contact_info": "Contact",
+    "member_since": "Membre depuis"
   },
   "language": {
     "fr": "Français",

@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import api from '../services/api';
-import ReservationModal from '../components/ReservationModal';
-import ServiceBlock from '../components/ServiceBlock';
-import TechnicianBlock from '../components/TechnicianBlock';
+import api from '../../services/api';
+import ReservationModal from '../../components/ReservationModal';
+import ServiceBlock from '../../components/ServiceBlock';
+import TechnicianBlock from '../../components/TechnicianBlock';
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth';
 
 const IconSearch = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -51,6 +51,7 @@ export default function HomePage() {
   const { user } = useAuth();
   const [searchService, setSearchService] = useState('');
   const [searchCity, setSearchCity] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [categories, setCategories] = useState([]);
   const [techniciens, setTechniciens] = useState([]);
   const [services, setServices] = useState([]);
@@ -142,12 +143,18 @@ export default function HomePage() {
   }, []);
 
   const filteredServices = services.filter(s =>
-    !searchService || s.titre?.toLowerCase().includes(searchService.toLowerCase())
+    (!searchService || s.titre?.toLowerCase().includes(searchService.toLowerCase())) &&
+    (!selectedCategory || s.categorie_id === selectedCategory || s.categorie_nom === selectedCategory)
   );
 
-  const filteredTechniciens = techniciens.filter(t =>
-    !searchCity || t.ville?.toLowerCase().includes(searchCity.toLowerCase())
-  );
+  const filteredTechniciens = techniciens
+    .filter(t => !searchCity || (t.adresse && t.adresse.toLowerCase().includes(searchCity.toLowerCase())))
+    .sort((a, b) => {
+      if (!selectedCategory) return 0;
+      const aMatch = a.specialite === selectedCategory ? -1 : 1;
+      const bMatch = b.specialite === selectedCategory ? -1 : 1;
+      return aMatch - bMatch;
+    });
 
   const statKeys = ['home.stats_techs', 'home.stats_bookings', 'home.stats_reviews'];
 
@@ -194,7 +201,13 @@ export default function HomePage() {
           <div className="flex flex-wrap gap-2 mt-6 items-center">
             <span className="text-sm text-white/75 mr-2">{t('home.popular_label')}</span>
             {categories.slice(0, 5).map(c => (
-              <button className="py-[6px] px-4 bg-white/15 border border-white/30 rounded-full text-sm text-white cursor-pointer backdrop-blur-[4px] font-body hover:bg-white/30 hover:border-white transition-all duration-[var(--transition-base)]" key={c.id || c.nom}>
+              <button onClick={() => setSelectedCategory(selectedCategory === c.nom ? null : c.nom)}
+                className={`py-[6px] px-4 border rounded-full text-sm cursor-pointer backdrop-blur-[4px] font-body transition-all duration-[var(--transition-base)] ${
+                  selectedCategory === c.nom
+                    ? 'bg-white text-[var(--color-primary)] border-white'
+                    : 'bg-white/15 text-white border-white/30 hover:bg-white/30 hover:border-white'
+                }`}
+                key={c.id || c.nom}>
                 {c.nom}
               </button>
             ))}
@@ -203,7 +216,7 @@ export default function HomePage() {
       </section>
 
       <section id="services-section" className="mb-12">
-        <div className="flex items-end justify-between mb-8 flex-wrap gap-4">
+        <div className="flex items-end justify-between mb-8 flex-wrap gap-4 max-md:flex-col max-md:items-start">
           <div>
             <h2 className="font-display text-[var(--text-xl)] font-bold text-[var(--color-text)] m-0">
               {t('home.section_available_services_title')}
@@ -212,9 +225,15 @@ export default function HomePage() {
               {t('home.section_available_services_subtitle')}
             </p>
           </div>
+          <button onClick={() => navigate('/services')} className="text-sm font-semibold text-[var(--color-secondary)] no-underline inline-flex items-center gap-1 cursor-pointer transition-colors duration-[var(--transition-base)] bg-none border-none font-body p-0 hover:text-[var(--color-secondary-hover)]">
+            {t('home.view_all')} <IconArrowRight />
+          </button>
         </div>
 
         <div className="grid grid-cols-3 gap-5 max-lg:grid-cols-2 max-sm:grid-cols-1">
+          {filteredServices.length === 0 && (
+            <p className="col-span-full text-center text-[var(--color-text-muted)] py-8">{t('home.no_results')}</p>
+          )}
           {filteredServices.map(s => (
             <ServiceBlock
               key={s.id}

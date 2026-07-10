@@ -15,7 +15,8 @@
     "switch_mode": "Switch mode",
     "search_placeholder": "Search...",
     "default_user": "User",
-    "default_role": "Administrator"
+    "default_role": "Administrator",
+    "back_home": "Home"
   },
   "public_nav": {
     "dashboard": "Dashboard",
@@ -71,6 +72,10 @@
     "stats_reviews": "Customer reviews",
     "cta_title": "Are you a technician?",
     "cta_subtitle": "Join our network of certified professionals and grow your business. Free registration, among the lowest commissions on the market.",
+    "all_categories": "All categories",
+    "view_all_services": "All services",
+    "view_all_technicians": "All technicians",
+    "no_results": "No results found",
     "cta_close": "Close",
     "cta_button": "Become a partner",
     "partner_title": "Become a partner",
@@ -377,6 +382,20 @@
     "report_unresolved": "Report unresolved",
     "resolve": "Resolve", 
     "label_docs": "Documents"
+  },
+  "technicien_profile": {
+    "title": "Technician Profile",
+    "specialite": "Specialty",
+    "score": "Score",
+    "avis_label": "Reviews",
+    "no_avis": "No reviews yet",
+    "gallery_title": "Work Gallery",
+    "no_gallery": "No work in gallery yet",
+    "completed_on": "Completed on",
+    "note_label": "Rating",
+    "back_to_home": "Back to home",
+    "contact_info": "Contact",
+    "member_since": "Member since"
   },
   "language": {
     "fr": "Français",

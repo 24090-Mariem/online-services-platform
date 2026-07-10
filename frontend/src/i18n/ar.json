@@ -15,7 +15,8 @@
     "switch_mode": "تغيير الوضع",
     "search_placeholder": "بحث...",
     "default_user": "مستخدم",
-    "default_role": "مدير"
+    "default_role": "مدير",
+    "back_home": "الرئيسية"
   },
   "public_nav": {
     "dashboard": "لوحة التحكم",
@@ -71,6 +72,10 @@
     "stats_reviews": "تقييم عميل",
     "cta_title": "هل أنت تقني؟",
     "cta_subtitle": "انضم إلى شبكتنا من المهنيين المعتمدين وطور نشاطك التجاري. التسجيل مجاني، وأقل عمولة في السوق.",
+    "all_categories": "جميع التصنيفات",
+    "view_all_services": "جميع الخدمات",
+    "view_all_technicians": "جميع التقنيين",
+    "no_results": "لا توجد نتائج",
     "cta_close": "إغلاق",
     "cta_button": "كن شريكاً",
     "partner_title": "كن شريكاً",
@@ -373,6 +378,20 @@
     "empty_subtitle": "ستظهر التقييمات بعد إتمام الحجوزات",
     "loading": "جارٍ التحميل..."
     
+  },
+  "technicien_profile": {
+    "title": "ملف التقني",
+    "specialite": "التخصص",
+    "score": "التقييم",
+    "avis_label": "التقييمات",
+    "no_avis": "لا توجد تقييمات بعد",
+    "gallery_title": "معرض الأعمال",
+    "no_gallery": "لا توجد أعمال في المعرض بعد",
+    "completed_on": "أكتمل في",
+    "note_label": "التقييم",
+    "back_to_home": "العودة إلى الرئيسية",
+    "contact_info": "معلومات الاتصال",
+    "member_since": "عضو منذ"
   },
   "language": {
     "fr": "Français",

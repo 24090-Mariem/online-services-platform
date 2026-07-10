@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { ROUTE_MAP, getActiveKey } from '../../components/layout/sidebarConfig';
-import HomePage from '../HomePage';
+import HomePage from './Home';
 import MesReservations from './MesReservations';
 import MesAvis from './MesAvis';
 import ProfilePage from '../common/ProfilePage';
@@ -31,7 +31,7 @@ const DashboardClient = () => {
       onNavigate={handleNavigate}
     >
       <Routes>
-        <Route index element={<HomePage />} />
+        <Route index element={<HomePage/>} />
         <Route path="mes-reservations" element={<MesReservations />} />
         <Route path="mes-avis" element={<MesAvis />} />
         <Route path="profil" element={<ProfilePage />} />

@@ -9,7 +9,6 @@ export default function ReservationModal({ service, onClose }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [date, setDate] = useState('');
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -19,21 +18,16 @@ export default function ReservationModal({ service, onClose }) {
       navigate('/login');
       return;
     }
-    if (!date) {
-      toast.error('Veuillez sélectionner une date');
-      return;
-    }
     setSubmitting(true);
     try {
       await api.post('/reservations', {
         service_id: service.id,
-        date_service: date,
-        notes,
+        notes: notes || undefined,
       });
-      toast.success('Réservation effectuée avec succès');
+      toast.success(t('reservations.book_success') || 'Réservation effectuée avec succès');
       onClose();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Erreur lors de la réservation');
+      toast.error(err.response?.data?.message || t('reservations.error') || 'Erreur lors de la réservation');
     } finally {
       setSubmitting(false);
     }
@@ -58,25 +52,13 @@ export default function ReservationModal({ service, onClose }) {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-semibold text-[var(--color-text)]">
-              {t('reservations.date_label') || 'Date'} *
-            </label>
-            <input
-              type="datetime-local"
-              value={date}
-              onChange={e => setDate(e.target.value)}
-              required
-              className="w-full py-[11px] px-3 border-[1.5px] border-[var(--color-border)] rounded-[var(--radius-md)] bg-[var(--color-background)] font-body text-sm text-[var(--color-text)] outline-none focus:border-[var(--color-secondary)]"
-            />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-[var(--color-text)]">
-              {t('reservations.notes_label') || 'Notes'}
+              {t('reservations.notes_label') || 'Commentaire (optionnel)'}
             </label>
             <textarea
               value={notes}
               onChange={e => setNotes(e.target.value)}
               rows={3}
+              placeholder={t('reservations.notes_placeholder') || 'Ajoutez un commentaire...'}
               className="w-full py-[11px] px-3 border-[1.5px] border-[var(--color-border)] rounded-[var(--radius-md)] bg-[var(--color-background)] font-body text-sm text-[var(--color-text)] outline-none focus:border-[var(--color-secondary)] resize-none"
             />
           </div>

@@ -100,7 +100,7 @@ describe('RESERVATION MODULE TESTS', () => {
     it('should create a reservation as client', async () => {
       const res = await clientAgent
         .post('/api/reservations')
-        .send({ service_id: serviceId, date_service: new Date().toISOString(), notes: 'Test reservation' });
+        .send({ service_id: serviceId, notes: 'Test reservation' });
       expect(res.statusCode).toBe(201);
       expect(res.body.success).toBe(true);
       reservationId = res.body.data?.reservationId;
@@ -125,6 +125,14 @@ describe('RESERVATION MODULE TESTS', () => {
         .post('/api/reservations')
         .send({ service_id: serviceId });
       expect(res.statusCode).toBe(403);
+    });
+
+    it('should reject duplicate active reservation for same service', async () => {
+      const res = await clientAgent
+        .post('/api/reservations')
+        .send({ service_id: serviceId, notes: 'Duplicate' });
+      expect(res.statusCode).toBe(400);
+      expect(res.body.message).toMatch(/déjà/i);
     });
   });
 

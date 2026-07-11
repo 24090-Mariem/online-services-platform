@@ -38,6 +38,14 @@ const ReservationModel = {
     return rows;
   },
 
+  async findActiveByClientAndService(clientId, serviceId) {
+    const [rows] = await db.execute(
+      'SELECT id FROM reservations WHERE client_id = ? AND service_id = ? AND statut IN ("EN_ATTENTE", "CONFIRMEE") LIMIT 1',
+      [clientId, serviceId]
+    );
+    return rows[0] || null;
+  },
+
   async create(data) {
     const { client_id, service_id, date_service, notes, montant } = data;
     const [result] = await db.execute(

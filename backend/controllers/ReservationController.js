@@ -10,11 +10,13 @@ exports.create = async (req, res, next) => {
   try {
     const client = await ClientModel.findByUserId(req.user.user_id);
     if (!client) return respondForbidden(res, 'Profil client introuvable');
-    const { service_id, date_service, notes } = req.body;
+    const { service_id, notes } = req.body;
     const service = await ServiceModel.findById(service_id);
     if (!service) return respondNotFound(res, 'Service introuvable');
     if (!service.est_actif) return respondBadRequest(res, 'Ce service n\'est plus disponible');
-    const id = await ReservationModel.create({ client_id: client.id, service_id, date_service, notes, montant: service.prix });
+    const existing = await ReservationModel.findActiveByClientAndService(client.id, service_id);
+    if (existing) return respondBadRequest(res, 'Vous avez déjà une réservation active pour ce service');
+    const id = await ReservationModel.create({ client_id: client.id, service_id, date_service: new Date().toISOString(), notes, montant: service.prix });
 
     const tech = await TechnicienModel.findById(service.technicien_id);
     if (tech) {

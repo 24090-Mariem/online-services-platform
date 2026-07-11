@@ -5,10 +5,6 @@ const createReservationRules = [
   body('service_id')
     .isInt({ min: 1 })
     .withMessage('ID de service invalide'),
-  body('date_service')
-    .optional({ values: 'falsy' })
-    .isISO8601()
-    .withMessage('Date de service invalide'),
   body('notes')
     .optional({ values: 'falsy' })
     .trim()

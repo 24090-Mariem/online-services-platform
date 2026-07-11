@@ -1,7 +1,7 @@
 const { body, validationResult } = require('express-validator');
 const { sendError } = require('../utils/response');
 
-const NAME_PATTERN = /^[a-zA-ZÀ-ÿa-zA-Z\s\-']+$/;
+const NAME_PATTERN = /^[\p{L}\s\-']+$/u;
 const TELEPHONE_PATTERN = /^[+\d][\d\s\-().]{6,20}$/;
 
 const registerRules = [

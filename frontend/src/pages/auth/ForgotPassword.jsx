@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import InputField from '../../components/forms/InputField';
 import ErrorMessage from '../../components/ui/ErrorMessage';
 import { MailIcon } from '../../components/ui/Icons';
-import api from '../../services/authService';
+import api from '../../services/api';
 
 export default function ForgotPassword() {
   const { t } = useTranslation();

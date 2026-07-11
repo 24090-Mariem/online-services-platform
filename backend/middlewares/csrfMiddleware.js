@@ -22,12 +22,8 @@ const csrfProtection = (req, res, next) => {
     return next();
   }
 
-  // 🟡 FIX: normalize header access
   const cookieToken = req.cookies[COOKIE_NAME];
   const headerToken = req.headers[HEADER_NAME.toLowerCase()];
-
-  // 🟡 DEBUG SAFE (optionnel)
-  console.log("CSRF:", req.method, req.path);
 
   if (!cookieToken || !headerToken || cookieToken !== headerToken) {
     return res.status(403).json({

@@ -2,8 +2,9 @@ const pool = require('../config/db');
 const bcrypt = require('bcrypt');
 const UserModel = require('../models/UserModel');
 const AppError = require('../utils/AppError');
+const tokenStore = require('../utils/tokenStore');
 
-const NAME_PATTERN = /^[a-zA-ZÀ-ÿa-zA-Z\s\-']+$/;
+const NAME_PATTERN = /^[\p{L}\s\-']+$/u;
 const TELEPHONE_PATTERN = /^[+\d][\d\s\-().]{6,20}$/;
 
 const validatePassword = (password) => {
@@ -45,8 +46,39 @@ const userService = {
       throw new AppError(`${roleLabel} introuvable`, 404);
     }
     if (existing.is_active === 0) {
-      throw new AppError(`${roleLabel} est déjà désactivé`, 400);
+      return true;
     }
+
+    const role = existing.role || roleLabel;
+
+    if (role === 'technicien') {
+      const [serviceIds] = await pool.execute('SELECT id FROM services WHERE technicien_id = ?', [existing.id]);
+      if (serviceIds.length > 0) {
+        const ids = serviceIds.map(r => r.id);
+        const placeholders = ids.map(() => '?').join(',');
+        await pool.execute(`DELETE FROM reservations WHERE service_id IN (${placeholders})`, ids);
+      }
+      await pool.execute('DELETE FROM services WHERE technicien_id = ?', [existing.id]);
+      await pool.execute('DELETE FROM galerie WHERE technicien_id = ?', [existing.id]);
+      await pool.execute('DELETE FROM avis WHERE technicien_id = ?', [existing.id]);
+      await pool.execute('DELETE FROM demandes_techniciens WHERE user_id = ?', [existing.user_id]);
+    } else if (role === 'client') {
+      const [reservationIds] = await pool.execute('SELECT id FROM reservations WHERE client_id = ?', [existing.id]);
+      if (reservationIds.length > 0) {
+        const ids = reservationIds.map(r => r.id);
+        const placeholders = ids.map(() => '?').join(',');
+        await pool.execute(`DELETE FROM avis WHERE reservation_id IN (${placeholders})`, ids);
+      }
+      await pool.execute('DELETE FROM reservations WHERE client_id = ?', [existing.id]);
+      await pool.execute('DELETE FROM avis WHERE client_id = ?', [existing.id]);
+    }
+
+    if (typeof Model.delete === 'function') {
+      await Model.delete(existing.id);
+    }
+    await tokenStore.revokeAllForUser(existing.user_id);
+    await pool.execute('DELETE FROM password_reset_tokens WHERE user_id = ?', [existing.user_id]);
+    await pool.execute('DELETE FROM notifications WHERE user_id = ?', [existing.user_id]);
     await pool.execute('UPDATE users SET is_active = 0, email = CONCAT("deleted_", id, "_", email) WHERE id = ?', [existing.user_id]);
     return true;
   },

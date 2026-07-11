@@ -40,9 +40,11 @@ export function AuthProvider({ children }) {
       const res = await authService.loginUser(email, password);
       const userData = res.data.data.user;
       setUser(userData);
-      const role = userData.role || (Array.isArray(userData.roles) ? userData.roles[0] : null) || 'client';
-      setCurrentMode(role);
-      localStorage.setItem('currentMode', role);
+      const role = userData.role || (Array.isArray(userData.roles) && userData.roles.length > 0 ? userData.roles[0] : null);
+      if (role) {
+        setCurrentMode(role);
+        localStorage.setItem('currentMode', role);
+      }
       return res.data;
     } catch (err) {
       const data = err.response?.data;
@@ -59,9 +61,11 @@ export function AuthProvider({ children }) {
       const res = await authService.registerUser(data);
       const userData = res.data.data.user;
       setUser(userData);
-      const role = userData.role || (Array.isArray(userData.roles) ? userData.roles[0] : null) || 'client';
-      setCurrentMode(role);
-      localStorage.setItem('currentMode', role);
+      const role = userData.role || (Array.isArray(userData.roles) && userData.roles.length > 0 ? userData.roles[0] : null);
+      if (role) {
+        setCurrentMode(role);
+        localStorage.setItem('currentMode', role);
+      }
       return res.data;
     } catch (err) {
       const data = err.response?.data;

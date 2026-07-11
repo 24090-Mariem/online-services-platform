@@ -5,18 +5,24 @@ const TechnicienModel = {
     let sql = `SELECT t.*, u.email, u.is_active, COALESCE(t.photo_profil, u.photo_profil) AS photo_profil, u.created_at
        FROM techniciens t
        JOIN users u ON u.id = t.user_id
+       WHERE u.is_active = 1
        ORDER BY t.id DESC`;
+    const params = [];
     if (limit != null) {
       const n = Number(limit);
       if (!Number.isInteger(n) || n < 1) throw new Error('LIMIT must be a positive integer');
-      sql += ` LIMIT ${n}`;
+      sql += ` LIMIT ?`;
+      params.push(Math.min(n, 100));
     }
     if (offset != null) {
       const n = Number(offset);
       if (!Number.isInteger(n) || n < 0) throw new Error('OFFSET must be a non-negative integer');
-      if (n > 0) sql += ` OFFSET ${n}`;
+      if (n > 0) {
+        sql += ` OFFSET ?`;
+        params.push(n);
+      }
     }
-    const [rows] = await pool.execute(sql);
+    const [rows] = params.length > 0 ? await pool.query(sql, params) : await pool.execute(sql);
     return rows;
   },
 

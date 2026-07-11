@@ -28,6 +28,7 @@ function initIO(httpServer) {
       if (!token) return next(new Error('Non authentifié'));
       const decoded = verifyAccessToken(token);
       socket.userId = decoded.id;
+      socket.lastTokenUpdate = Date.now();
       next();
     } catch {
       next(new Error('Token invalide ou expiré'));
@@ -38,7 +39,46 @@ function initIO(httpServer) {
     if (socket.userId) {
       socket.join(`user_${socket.userId}`);
     }
-    socket.on('disconnect', () => {});
+
+    socket.on('token:update', (newToken) => {
+      try {
+        const decoded = verifyAccessToken(newToken);
+        socket.userId = decoded.id;
+        socket.lastTokenUpdate = Date.now();
+      } catch {
+        socket.emit('auth:expired');
+        socket.disconnect(true);
+      }
+    });
+
+    socket.heartbeatInterval = setInterval(() => {
+      const timeSinceUpdate = Date.now() - socket.lastTokenUpdate;
+
+      if (timeSinceUpdate < 30 * 60 * 1000) {
+        return;
+      }
+
+      try {
+        const cookies = parseCookies(socket.handshake.headers.cookie);
+        const token = cookies.token;
+        if (!token) {
+          socket.emit('auth:expired');
+          socket.disconnect(true);
+          return;
+        }
+        verifyAccessToken(token);
+        socket.lastTokenUpdate = Date.now();
+      } catch {
+        socket.emit('auth:expired');
+        socket.disconnect(true);
+      }
+    }, 5 * 60 * 1000);
+
+    socket.on('disconnect', () => {
+      if (socket.heartbeatInterval) {
+        clearInterval(socket.heartbeatInterval);
+      }
+    });
   });
 
   return io;

@@ -24,6 +24,12 @@ export default function SetPassword() {
 
     if (!password || password.length < 8) {
       newErrors.password = t('auth.min_password');
+    } else if (!/[A-Z]/.test(password)) {
+      newErrors.password = 'Le mot de passe doit contenir une majuscule';
+    } else if (!/[0-9]/.test(password)) {
+      newErrors.password = 'Le mot de passe doit contenir un chiffre';
+    } else if (!/[^A-Za-z0-9]/.test(password)) {
+      newErrors.password = 'Le mot de passe doit contenir un caractère spécial';
     }
 
     if (password !== confirmPassword) {

@@ -4,7 +4,7 @@ const pool = require('../config/db');
 const TABLE = 'password_reset_tokens';
 
 const PasswordResetModel = {
-  async create(userId, ttlMs = 3 * 60 * 1000) {
+  async create(userId, ttlMs = 15 * 60 * 1000) {
     const code = String(crypto.randomInt(100000, 1000000));
     const tokenHash = crypto.createHash('sha256').update(code).digest('hex');
     const expiresAt = new Date(Date.now() + ttlMs);

@@ -1,5 +1,5 @@
 const AuthService = require('../services/authService');
-const { sendSuccess } = require('../utils/response');
+const { sendSuccess, sendError } = require('../utils/response');
 const { sendAccessTokenCookie, sendRefreshTokenCookie, clearAuthCookies } = require('../utils/jwt');
 
 const register = async (req, res, next) => {
@@ -33,6 +33,9 @@ const login = async (req, res, next) => {
 const refresh = async (req, res, next) => {
   try {
     const refreshToken = req.cookies?.refresh_token;
+    if (!refreshToken) {
+      return sendError(res, 'Non authentifié', 401);
+    }
     const { accessToken, refreshToken: newRefreshToken, user } = await AuthService.refresh(refreshToken);
 
     sendAccessTokenCookie(res, accessToken);

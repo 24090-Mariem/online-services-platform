@@ -88,7 +88,7 @@ export default function HomePage() {
       fd.append('nom', partnerForm.nom);
       fd.append('prenom', partnerForm.prenom);
       fd.append('email', partnerForm.email);
-      fd.append('telephone', partnerForm.telephone || '');
+      if (partnerForm.telephone) fd.append('telephone', partnerForm.telephone);
       fd.append('specialite', partnerForm.specialite);
       if (partnerForm.piece_identite) fd.append('piece_identite', partnerForm.piece_identite);
       if (partnerForm.diplome) fd.append('diplome', partnerForm.diplome);

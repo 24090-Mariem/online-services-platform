@@ -1,11 +1,11 @@
 const pool = require('../config/db');
 const { validationResult } = require('express-validator');
 const AdministrateurModel = require('../models/AdministrateurModel');
-const PasswordResetModel = require('../models/PasswordResetModel');
+ 
 const userService = require('../services/userService');
 const demandeService = require('../services/demandeService');
 const { createNotification } = require('../services/notificationService');
-const { sendWelcomeWithLink } = require('../services/emailService');
+
 const { respondData, respondMessage, respondNotFound, respondBadRequest, getPagination, getPaginationMeta } = require('../utils/response');
 const { sanitizePlainText } = require('../validations/sanitize');
 
@@ -90,16 +90,8 @@ exports.approveDemande = async (req, res, next) => {
     const body = req.body || {};
     const commentaireAdmin = sanitizePlainText(body.commentaireAdmin || '');
     const result = await demandeService.approve(req.params.id, adminId, commentaireAdmin);
-
+   
     const demande = await demandeService.findDemande(req.params.id);
-    if (!demande) return respondNotFound(res, 'Demande introuvable');
-
-    const setupToken = await PasswordResetModel.create(demande.user_id, 3 * 60 * 60 * 1000);
-    const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
-    const setupLink = `${clientUrl}/set-password?token=${setupToken}&email=${encodeURIComponent(demande.email)}`;
-
-    await sendWelcomeWithLink(demande.email, demande.nom, demande.prenom, setupLink)
-      .catch(err => console.error('[Email] Erreur envoi bienvenue:', err.message));
 
     await createNotification(
       demande.user_id,
@@ -108,8 +100,11 @@ exports.approveDemande = async (req, res, next) => {
       'info'
     );
 
-    const msg = 'Demande approuvée. Le compte technicien a été créé. Un email a été envoyé pour configurer le mot de passe.';
-    respondData(res, { message: msg });
+    const emailMsg = result.emailSent
+      ? 'Un email a été envoyé pour configurer le mot de passe.'
+      : `L'email n'a pas pu être envoyé. Lien de configuration : ${result.setupLink}`;
+    const msg = `Demande approuvée. Le compte technicien a été créé. ${emailMsg}`;
+    respondData(res, { message: msg, emailSent: result.emailSent });
   } catch (error) {
     next(error);
   }

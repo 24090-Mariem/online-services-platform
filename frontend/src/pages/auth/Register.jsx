@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
+import { getDashboardPath } from '../../utils/dashboard';
 import InputField from '../../components/forms/InputField';
 import PasswordField from '../../components/forms/PasswordField';
 import ErrorMessage from '../../components/ui/ErrorMessage';
 import { MailIcon } from '../../components/ui/Icons';
 
-const NAME_PATTERN = /^[a-zA-ZÀ-ÿa-zA-Z\s\-']+$/;
+const NAME_PATTERN = /^[\p{L}\s\-']+$/u;
 const TELEPHONE_PATTERN = /^[+\d][\d\s\-().]{6,20}$/;
 
 export default function Register() {
@@ -53,8 +54,8 @@ export default function Register() {
 
     setSubmitting(true);
     try {
-      await register(form);
-      navigate('/client/dashboard', { replace: true });
+      const result = await register(form);
+      navigate(getDashboardPath(result.data.user.role), { replace: true });
     } catch (err) {
       const data = err.response?.data;
       if (data?.errors?.length) {

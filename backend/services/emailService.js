@@ -71,4 +71,27 @@ async function sendWelcomeEmail(to, nom, prenom) {
   });
 }
 
-module.exports = { sendPasswordResetEmail, sendWelcomeEmail, sendWelcomeWithLink };
+async function sendDemandeConfirmation(to, nom, prenom) {
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+    to,
+    subject: 'Confirmation de votre demande d\'inscription',
+    text: `Bonjour ${prenom} ${nom},\n\nNous avons bien reçu votre demande d'inscription en tant que technicien.\n\nVotre demande est en cours de traitement par notre équipe. Vous recevrez un email dès qu'elle sera approuvée avec un lien pour créer votre mot de passe.\n\nCordialement,\nL'équipe ${process.env.APP_NAME || 'CodevaServices'}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2 style="color: #6366f1;">Demande reçue !</h2>
+        <p>Bonjour <strong>${prenom} ${nom}</strong>,</p>
+        <p>Nous avons bien reçu votre demande d'inscription en tant que technicien.</p>
+        <div style="background: #fef9c3; border: 1px solid #facc15; border-radius: 8px; padding: 16px; margin: 20px 0;">
+          <p style="margin: 0; font-size: 14px; color: #854d0e;">
+            <strong>⏳ En attente de validation</strong><br>
+            Votre demande est en cours de traitement par notre équipe. Vous recevrez un email dès qu'elle sera approuvée.
+          </p>
+        </div>
+        <p style="color: #6b7280; font-size: 14px;">Cordialement,<br>L'équipe ${process.env.APP_NAME || 'CodevaServices'}</p>
+      </div>
+    `,
+  });
+}
+
+module.exports = { sendPasswordResetEmail, sendWelcomeEmail, sendWelcomeWithLink, sendDemandeConfirmation };

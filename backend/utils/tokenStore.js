@@ -12,18 +12,19 @@ class TokenStore {
     return crypto.createHash('sha256').update(token).digest('hex');
   }
 
-  async store(userId, ttlMs = 7 * 24 * 60 * 60 * 1000) {
+  async store(userId, ttlMs = 7 * 24 * 60 * 60 * 1000, familyId = null) {
     const raw = crypto.randomBytes(32).toString('hex');
     const hash = this._hash(raw);
     const expiresAt = new Date(Date.now() + ttlMs);
+    const tokenFamily = familyId || crypto.randomBytes(16).toString('hex');
 
     await pool.execute(
-      `INSERT INTO ${TABLE} (user_id, token_hash, expires_at)
-       VALUES (?, ?, ?)`,
-      [userId, hash, expiresAt]
+      `INSERT INTO ${TABLE} (user_id, token_hash, expires_at, family_id)
+       VALUES (?, ?, ?, ?)`,
+      [userId, hash, expiresAt, tokenFamily]
     );
 
-    return raw;
+    return { raw, familyId: tokenFamily };
   }
 
   async verify(token) {
@@ -32,7 +33,7 @@ class TokenStore {
     const hash = this._hash(token);
 
     const [rows] = await pool.execute(
-      `SELECT user_id, revoked, expires_at
+      `SELECT user_id, revoked, expires_at, family_id
        FROM ${TABLE}
        WHERE token_hash = ?`,
       [hash]
@@ -45,14 +46,21 @@ class TokenStore {
     const expired = new Date(row.expires_at) < new Date();
 
     if (row.revoked || expired) {
-      await pool.execute(
-        `DELETE FROM ${TABLE} WHERE token_hash = ?`,
-        [hash]
-      );
+      if (row.family_id) {
+        await pool.execute(
+          `DELETE FROM ${TABLE} WHERE family_id = ?`,
+          [row.family_id]
+        );
+      } else {
+        await pool.execute(
+          `DELETE FROM ${TABLE} WHERE token_hash = ?`,
+          [hash]
+        );
+      }
       return null;
     }
 
-    return row.user_id;
+    return { userId: row.user_id, familyId: row.family_id };
   }
 
   async revoke(token) {

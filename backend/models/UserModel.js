@@ -45,10 +45,10 @@ const UserModel = {
     return user || null;
   },
 
-  async createUser(conn, { email, password_hash }) {
+  async createUser(conn, { email, password_hash, is_active }) {
     const [result] = await conn.execute(
-      'INSERT INTO users (email, password_hash) VALUES (?, ?)',
-      [email, password_hash]
+      'INSERT INTO users (email, password_hash, is_active) VALUES (?, ?, ?)',
+      [email, password_hash, is_active ?? 1]
     );
 
     return result.insertId;

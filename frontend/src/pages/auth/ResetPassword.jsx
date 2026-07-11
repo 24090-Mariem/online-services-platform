@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import InputField from '../../components/forms/InputField';
 import PasswordField from '../../components/forms/PasswordField';
 import ErrorMessage from '../../components/ui/ErrorMessage';
-import api from '../../services/authService';
+import api from '../../services/api';
 
 export default function ResetPassword() {
   const { t } = useTranslation();
@@ -28,6 +28,12 @@ export default function ResetPassword() {
       newErrors.password = t('auth.password_required');
     } else if (password.length < 8) {
       newErrors.password = t('auth.min_password');
+    } else if (!/[A-Z]/.test(password)) {
+      newErrors.password = 'Le mot de passe doit contenir une majuscule';
+    } else if (!/[0-9]/.test(password)) {
+      newErrors.password = 'Le mot de passe doit contenir un chiffre';
+    } else if (!/[^A-Za-z0-9]/.test(password)) {
+      newErrors.password = 'Le mot de passe doit contenir un caractère spécial';
     }
 
     if (password !== confirmPassword) {

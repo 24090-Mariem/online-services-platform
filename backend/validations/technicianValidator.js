@@ -8,7 +8,7 @@ const PASSWORD_RULES = {
 const NAME_RULES = {
   minLength: 1,
   maxLength: 100,
-  pattern: /^[a-zA-ZÀ-ÿa-zA-Z\s\-']+$/,
+  pattern: /^[\p{L}\s\-']+$/u,
 };
 
 const TELEPHONE_RULES = {

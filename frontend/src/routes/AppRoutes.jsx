@@ -38,7 +38,7 @@ function ProtectedRoute({ children, roles }) {
   return children;
 }
 
-function PublicRoute({ children }) {
+function PublicRoute({ children }) { 
   const { user, loading } = useAuth();
 
   if (loading) return <LoadingScreen />;

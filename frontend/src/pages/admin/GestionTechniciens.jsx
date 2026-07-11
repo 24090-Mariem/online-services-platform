@@ -4,7 +4,7 @@ import api from '../../services/api';
 import AdminPageLayout from '../../components/layout/AdminPageLayout';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
-const NAME_PATTERN = /^[a-zA-ZÀ-ÿa-zA-Z\s\-']+$/;
+const NAME_PATTERN = /^[\p{L}\s\-']+$/u;
 const TELEPHONE_PATTERN = /^[+\d][\d\s\-().]{6,20}$/;
 
 const emptyForm = {
@@ -29,6 +29,8 @@ const validateForm = (form, editingId) => {
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = 'Email invalide';
 
   if (telephone && !TELEPHONE_PATTERN.test(telephone)) errors.telephone = 'Format de téléphone invalide';
+
+  if (!form.categorie_id) errors.categorie_id = 'Veuillez sélectionner une spécialité';
 
   if (!editingId) {
     if (!password) errors.password = 'Le mot de passe est requis';
@@ -158,9 +160,9 @@ export default function GestionTechniciens() {
   const handleDelete = async (id) => {
     try {
       await api.delete(`/techniciens/${id}`);
-      showMessage('success', t('admin.delete_success'));
+      showMessage('success', t('admin.technician_deleted'));
       await load();
-    } catch { showMessage('error', t('admin.delete_error')); }
+    } catch (err) { showMessage('error', err.response?.data?.message || t('admin.delete_error')); }
   };
 
   const inputClass = "w-full py-[11px] px-3 border-[1.5px] border-[var(--color-border)] rounded-[var(--radius-md)] font-body text-sm text-[var(--color-text)] bg-[var(--color-surface)]";
@@ -196,12 +198,13 @@ export default function GestionTechniciens() {
             <input name="adresse" placeholder={t('profile.label_adresse')} value={form.adresse} onChange={handleChange} className={inputClass} />
           </div>
           <div className="flex flex-col">
-          <select name="categorie_id" value={form.categorie_id} onChange={handleChange} required className={inputClass}>
+          <select name="categorie_id" value={form.categorie_id} onChange={handleChange} required className={errors.categorie_id ? inputErrorClass : inputClass}>
             <option value="">{t('admin.select_specialite')}</option>
             {categories.map(c => (
               <option key={c.id} value={c.id}>{c.nom}</option>
             ))}
-          </select></div>
+          </select>
+          {errors.categorie_id && <span className="text-xs text-[var(--color-error)]">{errors.categorie_id}</span>}</div>
           <div className="flex flex-col">
             <input name="password" type="password" placeholder={editingId ? t('admin.new_password') : 'Mot de passe *'} value={form.password} onChange={handleChange} required={!editingId} className={errors.password ? inputErrorClass : inputClass} />
             {errors.password && <span className="text-xs text-[var(--color-error)]">{errors.password}</span>}

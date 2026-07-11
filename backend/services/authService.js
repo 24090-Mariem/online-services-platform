@@ -44,7 +44,7 @@ const AuthService = {
         role: user.role,
       });
 
-      const refreshToken = await tokenStore.store(user.id);
+      const { raw: refreshToken } = await tokenStore.store(user.id);
 
       return {
         accessToken,
@@ -80,8 +80,8 @@ const AuthService = {
 
     const fullUser = await UserModel.findById(user.id);
 
-    const accessToken = signAccessToken({ id: user.id, role: user.role });
-    const refreshToken = await tokenStore.store(user.id);
+    const accessToken = signAccessToken({ id: fullUser.id, role: fullUser.role });
+    const { raw: refreshToken } = await tokenStore.store(fullUser.id);
 
     return {
       accessToken,
@@ -91,11 +91,17 @@ const AuthService = {
   },
 
   async refresh(refreshToken) {
-    const userId = await tokenStore.verify(refreshToken);
+    if (!refreshToken) {
+      throw new AppError('Non authentifié', 401);
+    }
 
-    if (!userId) {
+    const tokenData = await tokenStore.verify(refreshToken);
+
+    if (!tokenData) {
       throw new AppError('Session expirée, veuillez vous reconnecter', 401);
     }
+
+    const { userId, familyId } = tokenData;
 
     await tokenStore.revoke(refreshToken);
 
@@ -110,7 +116,7 @@ const AuthService = {
       role: user.role,
     });
 
-    const newRefreshToken = await tokenStore.store(user.id);
+    const { raw: newRefreshToken } = await tokenStore.store(user.id, 7 * 24 * 60 * 60 * 1000, familyId);
 
     return {
       accessToken: newAccessToken,
@@ -125,8 +131,11 @@ const AuthService = {
 
   async getMe(userId) {
     const user = await UserModel.findById(userId);
-    if (!user || user.is_active === 0) {
+    if (!user) {
       throw new AppError('Session expirée, veuillez vous reconnecter', 401);
+    }
+    if (user.is_active === 0) {
+      throw new AppError('Compte désactivé', 403);
     }
     return sanitizeUser(user);
   },
@@ -142,7 +151,7 @@ const AuthService = {
     const token = await PasswordResetModel.create(user.id);
 
     await sendPasswordResetEmail(email, token).catch(err => {
-      console.error('[Email] Erreur envoi:', err.message);
+      console.error('[Email] Erreur envoi reset password pour', user.id, ':', err.message);
     });
 
     return { message: 'Si cet email existe, un lien de réinitialisation a été envoyé' };
@@ -157,7 +166,7 @@ const AuthService = {
 
     const password_hash = await bcrypt.hash(newPassword, 12);
 
-    await pool.execute('UPDATE users SET password_hash = ? WHERE id = ?', [password_hash, record.user_id]);
+    await pool.execute('UPDATE users SET password_hash = ?, is_active = 1 WHERE id = ?', [password_hash, record.user_id]);
     await PasswordResetModel.delete(record.id);
     await tokenStore.revokeAllForUser(record.user_id);
   },

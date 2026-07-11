@@ -90,24 +90,22 @@ Elle permet aux utilisateurs de rechercher des services, trouver des techniciens
 
 # Architecture du projet
 Services/
-│
 ├── frontend/
 │ ├── src/
-│ │ ├── components/
-│ │ ├── pages/
-│ │ ├── services/
-│ │ ├── context/
-│ │ └── utils/
-│ │
+│ │ ├── components/ # Composants React réutilisables
+│ │ ├── pages/ # Pages de l'application
+│ │ ├── services/ # Appels API
+│ │ ├── context/ # Context API
+│ │ └── utils/ # Fonctions utilitaires
 │ └── package.json
 │
 ├── backend/
-│ ├── controllers/
-│ ├── models/
-│ ├── routes/
-│ ├── services/
-│ ├── middlewares/
-│ ├── validations/
+│ ├── controllers/ # Gestion des requêtes HTTP
+│ ├── models/ # Modèles base de données
+│ ├── routes/ # Routes API
+│ ├── services/ # Logique métier
+│ ├── middlewares/ # Authentification et sécurité
+│ ├── validations/ # Validation des données
 │ └── package.json
 │
 └── README.md
@@ -139,17 +137,6 @@ Installer les dépendances :
 npm install
 
 Créer un fichier .env :
-
-PORT=5000
-
-DB_HOST=localhost
-DB_USER=your_database_user
-DB_PASSWORD=your_database_password
-DB_NAME=plateforme_services
-
-JWT_SECRET=your_jwt_secret
-
-CLIENT_URL=http://localhost:5173
 
 Démarrer le serveur :
 

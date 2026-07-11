@@ -162,3 +162,6 @@ const userService = {
 };
 
 module.exports = userService;
+module.exports.validatePassword = validatePassword;
+module.exports.NAME_PATTERN = NAME_PATTERN;
+module.exports.TELEPHONE_PATTERN = TELEPHONE_PATTERN;

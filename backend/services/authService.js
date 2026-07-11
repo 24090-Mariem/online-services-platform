@@ -6,6 +6,9 @@ const tokenStore = require('../utils/tokenStore');
 const AppError = require('../utils/AppError');
 const pool = require('../config/db');
 const { sendPasswordResetEmail } = require('./emailService');
+const { validatePassword, NAME_PATTERN, TELEPHONE_PATTERN } = require('./userService');
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const AuthService = {
   async register({ email, password, nom, prenom, telephone }) {
@@ -14,7 +17,20 @@ const AuthService = {
     try {
       await conn.beginTransaction();
 
-      
+      if (!email || !EMAIL_PATTERN.test(email)) {
+        throw new AppError('Format d\'email invalide', 400);
+      }
+      if (!nom || nom.length < 1 || nom.length > 100 || !NAME_PATTERN.test(nom)) {
+        throw new AppError('Le nom est invalide (1-100 caractères, lettres uniquement)', 400);
+      }
+      if (prenom && (prenom.length > 100 || !NAME_PATTERN.test(prenom))) {
+        throw new AppError('Le prénom est invalide (max 100 caractères, lettres uniquement)', 400);
+      }
+      if (telephone && !TELEPHONE_PATTERN.test(telephone)) {
+        throw new AppError('Format de téléphone invalide', 400);
+      }
+      validatePassword(password);
+
       const existing = await UserModel.findByEmail(email);
       if (existing) {
         throw new AppError('Cet email est déjà utilisé', 409);

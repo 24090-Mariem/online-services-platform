@@ -207,7 +207,17 @@
     "save": "Enregistrer les modifications",
     "role_admin": "Administrateur",
     "role_technician": "Technicien",
-    "role_client": "Client"
+    "role_client": "Client",
+    "error_nom_required": "Le nom est requis",
+    "error_nom_max": "Le nom ne doit pas dépasser 100 caractères",
+    "error_prenom_required": "Le prénom est requis",
+    "error_prenom_max": "Le prénom ne doit pas dépasser 100 caractères",
+    "error_email_required": "L'email est requis",
+    "error_email_format": "Format d'email invalide",
+    "error_telephone_format": "Format de téléphone invalide",
+    "error_adresse_max": "L'adresse ne doit pas dépasser 255 caractères",
+    "error_specialite_max": "La spécialité ne doit pas dépasser 100 caractères",
+    "error_file_size": "Le fichier ne doit pas dépasser 5 Mo"
   },
   "reservations": {
     "my_title": "Mes Réservations",

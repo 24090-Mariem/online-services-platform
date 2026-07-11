@@ -7,6 +7,7 @@ const demandeService = require('../services/demandeService');
 const upload = require('../config/upload');
 const { respondData, respondMessage, respondNotFound, respondBadRequest, respondForbidden, getPagination, getPaginationMeta } = require('../utils/response');
 const { sanitizeObject } = require('../validations/sanitize');
+const { validatePassword } = require('../services/userService');
 
 const mapPrivateFile = (file) => {
   if (!file?.filename) return null;
@@ -41,7 +42,7 @@ exports.create = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   try {
-    const allowedFields = ['nom', 'prenom', 'email', 'password', 'telephone', 'adresse', 'specialite', 'est_verifie'];
+    const allowedFields = ['nom', 'prenom', 'email', 'password', 'telephone', 'adresse', 'specialite', 'est_verifie', 'piece_identite', 'photo_profil'];
     const data = Object.fromEntries(
       Object.entries(req.body).filter(([k]) => allowedFields.includes(k))
     );
@@ -54,8 +55,8 @@ exports.update = async (req, res, next) => {
     if (data.prenom !== undefined && (typeof data.prenom !== 'string' || data.prenom.length < 1 || data.prenom.length > 100)) {
       return respondBadRequest(res, 'Le prénom doit contenir entre 1 et 100 caractères');
     }
-    if (data.password !== undefined && data.password.length < 8) {
-      return respondBadRequest(res, 'Le mot de passe doit contenir au moins 8 caractères');
+    if (data.password !== undefined) {
+      try { validatePassword(data.password); } catch (e) { return respondBadRequest(res, e.message); }
     }
     if (data.telephone !== undefined && !/^[+\d][\d\s\-().]{6,20}$/.test(data.telephone)) {
       return respondBadRequest(res, 'Format de téléphone invalide');
@@ -89,9 +90,8 @@ exports.getById = async (req, res, next) => {
 exports.listPublic = async (req, res, next) => {
   try {
     const { page, limit, offset } = getPagination(req);
-    const all = await TechnicienModel.findAll(limit, offset);
-    const verified = all.filter(t => t.est_verifie);
-    const total = await TechnicienModel.countAll();
+    const verified = await TechnicienModel.findVerified(limit, offset);
+    const total = await TechnicienModel.countVerified();
     respondData(res, { data: verified, pagination: getPaginationMeta(page, limit, total) });
   } catch (error) {
     next(error);

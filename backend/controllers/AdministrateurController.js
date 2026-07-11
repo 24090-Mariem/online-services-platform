@@ -8,6 +8,7 @@ const { createNotification } = require('../services/notificationService');
 
 const { respondData, respondMessage, respondNotFound, respondBadRequest, getPagination, getPaginationMeta } = require('../utils/response');
 const { sanitizePlainText } = require('../validations/sanitize');
+const { validatePassword } = require('../services/userService');
 
 exports.list = async (req, res, next) => {
   try {
@@ -32,8 +33,8 @@ exports.update = async (req, res, next) => {
     if (data.nom !== undefined && (typeof data.nom !== 'string' || data.nom.length < 1 || data.nom.length > 100)) {
       return respondBadRequest(res, 'Le nom doit contenir entre 1 et 100 caractères');
     }
-    if (data.password !== undefined && data.password.length < 8) {
-      return respondBadRequest(res, 'Le mot de passe doit contenir au moins 8 caractères');
+    if (data.password !== undefined) {
+      try { validatePassword(data.password); } catch (e) { return respondBadRequest(res, e.message); }
     }
     await userService.update(AdministrateurModel, req.params.id, data, 'Administrateur');
     respondMessage(res, 'Administrateur mis à jour');

@@ -31,6 +31,38 @@ const TechnicienModel = {
     return rows[0].total;
   },
 
+  async findVerified(limit = null, offset = 0) {
+    let sql = `SELECT t.*, u.email, u.is_active, COALESCE(t.photo_profil, u.photo_profil) AS photo_profil, u.created_at
+       FROM techniciens t
+       JOIN users u ON u.id = t.user_id
+       WHERE u.is_active = 1 AND t.est_verifie = 1
+       ORDER BY t.score DESC, t.nom ASC`;
+    const params = [];
+    if (limit != null) {
+      const n = Number(limit);
+      if (!Number.isInteger(n) || n < 1) throw new Error('LIMIT must be a positive integer');
+      sql += ` LIMIT ?`;
+      params.push(Math.min(n, 100));
+    }
+    if (offset != null) {
+      const n = Number(offset);
+      if (!Number.isInteger(n) || n < 0) throw new Error('OFFSET must be a non-negative integer');
+      if (n > 0) {
+        sql += ` OFFSET ?`;
+        params.push(n);
+      }
+    }
+    const [rows] = params.length > 0 ? await pool.query(sql, params) : await pool.execute(sql);
+    return rows;
+  },
+
+  async countVerified() {
+    const [rows] = await pool.execute(
+      'SELECT COUNT(*) AS total FROM techniciens t JOIN users u ON u.id = t.user_id WHERE u.is_active = 1 AND t.est_verifie = 1'
+    );
+    return rows[0].total;
+  },
+
   async findById(id) {
     const [rows] = await pool.execute(
       `SELECT t.*, u.email, u.is_active, COALESCE(t.photo_profil, u.photo_profil) AS photo_profil, u.created_at

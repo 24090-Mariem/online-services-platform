@@ -207,7 +207,17 @@
     "save": "حفظ التغييرات",
     "role_admin": "مشرف",
     "role_technician": "تقني",
-    "role_client": "عميل"
+    "role_client": "عميل",
+    "error_nom_required": "الاسم العائلي مطلوب",
+    "error_nom_max": "الاسم العائلي يجب ألا يتجاوز 100 حرف",
+    "error_prenom_required": "الاسم الشخصي مطلوب",
+    "error_prenom_max": "الاسم الشخصي يجب ألا يتجاوز 100 حرف",
+    "error_email_required": "البريد الإلكتروني مطلوب",
+    "error_email_format": "تنسيق البريد الإلكتروني غير صالح",
+    "error_telephone_format": "تنسيق الهاتف غير صالح",
+    "error_adresse_max": "العنوان يجب ألا يتجاوز 255 حرف",
+    "error_specialite_max": "التخصص يجب ألا يتجاوز 100 حرف",
+    "error_file_size": "الملف يجب ألا يتجاوز 5 ميغابايت"
   },
   "reservations": {
     "my_title": "حجوزاتي",

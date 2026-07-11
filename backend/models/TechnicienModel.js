@@ -138,15 +138,32 @@ const TechnicienModel = {
     return rows;
   },
 
-  async updateScore(technicienId) {
-    const [rows] = await pool.execute(
-      `UPDATE techniciens t
-       SET t.score = (SELECT COALESCE(AVG(a.note), 0) * 10 FROM avis a WHERE a.technicien_id = ?)
-       WHERE t.id = ?`,
-      [technicienId, technicienId]
-    );
-    return rows.affectedRows > 0;
-  },
+  async addScore(technicienId, note) {
+  const points = Number(note) * 10;
+
+  const [rows] = await pool.execute(
+    `UPDATE techniciens
+     SET score = score + ?
+     WHERE id = ?`,
+    [points, technicienId]
+  );
+
+  return rows.affectedRows > 0;
+},
+async recalculateScore(technicienId) {
+  const [rows] = await pool.execute(
+    `UPDATE techniciens t
+     SET t.score = (
+       SELECT COALESCE(SUM(a.note * 10), 0)
+       FROM avis a
+       WHERE a.technicien_id = ?
+     )
+     WHERE t.id = ?`,
+    [technicienId, technicienId]
+  );
+
+  return rows.affectedRows > 0;
+}
 };
 
 module.exports = TechnicienModel;

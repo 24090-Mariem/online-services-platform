@@ -47,11 +47,8 @@ export default function GestionDemandes() {
     setLoading(true);
     try {
       const res = await api.get('/administrateurs/demandes/list');
-      console.log('Response:', res);
       const payload = res.data?.data ?? [];
-      console.log('Data:', payload);
       const list = Array.isArray(payload) ? payload : (Array.isArray(payload?.demandes) ? payload.demandes : []);
-      console.log('Is Array:', Array.isArray(list));
       setDemandes(list);
     } catch {
       showMessage('error', t('admin.load_error'));

@@ -35,7 +35,7 @@ async function createReview(userId, { reservation_id, technicien_id, note, comme
     commentaire,
   });
 
-  await TechnicienModel.updateScore(technicien_id);
+  await TechnicienModel.addScore(technicien_id, note);
 
   const tech = await TechnicienModel.findById(technicien_id);
   if (tech) {
@@ -68,7 +68,7 @@ async function updateReview(user, avisId, data) {
   if (!ok) throw new AppError('Avis introuvable', 404);
 
   const avis = await AvisModel.findById(avisId);
-  if (avis) await TechnicienModel.updateScore(avis.technicien_id);
+  if (avis) await TechnicienModel.recalculateScore(avis.technicien_id);
   return avis;
 }
 
@@ -76,7 +76,7 @@ async function deleteReview(user, avisId) {
   const avis = await assertReviewAccess(user, avisId);
   const ok = await AvisModel.delete(avisId);
   if (!ok) throw new AppError('Avis introuvable', 404);
-  await TechnicienModel.updateScore(avis.technicien_id);
+  await TechnicienModel.recalculateScore(avis.technicien_id);
   return avis;
 }
 

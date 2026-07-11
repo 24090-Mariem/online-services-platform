@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import api from '../../services/api';
+import { StarRating } from '../../utils/stars.jsx';
 
 export default function MesAvis() {
   const [avis, setAvis] = useState([]);
@@ -12,11 +13,8 @@ export default function MesAvis() {
     (async () => {
       try {
         const res = await api.get('/reviews/client/mine');
-        console.log('Response:', res);
         const payload = res.data?.data ?? [];
-        console.log('Data:', payload);
         const list = Array.isArray(payload) ? payload : (Array.isArray(payload?.data) ? payload.data : []);
-        console.log('Is Array:', Array.isArray(list));
         setAvis(list);
       } catch {
         toast.error(t('services.loading_error'));
@@ -47,12 +45,7 @@ export default function MesAvis() {
                   </p>
                 </div>
                 <div className="flex items-center gap-1">
-                  {[1,2,3,4,5].map(i => (
-                    <svg key={i} width="16" height="16" viewBox="0 0 24 24" fill={i <= Math.round((a.note||0)/2) ? 'var(--color-warning)' : 'none'} stroke="var(--color-warning)" strokeWidth="2">
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                    </svg>
-                  ))}
-                  <span className="text-sm font-semibold text-[var(--color-text)] ml-1">{a.note}/10</span>
+                  <StarRating score={a.note * 10} size={16} />
                 </div>
               </div>
               {a.commentaire && (

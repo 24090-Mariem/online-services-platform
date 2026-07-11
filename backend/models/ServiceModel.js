@@ -10,17 +10,19 @@ const ServiceModel = {
       JOIN categories c ON s.categorie_id = c.id
       ORDER BY s.id DESC
     `;
+    const params = [];
     if (limit != null) {
       const n = Number(limit);
       if (!Number.isInteger(n) || n < 1) throw new Error('LIMIT must be a positive integer');
-      sql += ` LIMIT ${n}`;
+      sql += ` LIMIT ?`;
+      params.push(n);
     }
     if (offset != null) {
       const n = Number(offset);
       if (!Number.isInteger(n) || n < 0) throw new Error('OFFSET must be a non-negative integer');
-      if (n > 0) sql += ` OFFSET ${n}`;
+      if (n > 0) { sql += ` OFFSET ?`; params.push(n); }
     }
-    const [rows] = await db.execute(sql);
+    const [rows] = params.length > 0 ? await db.query(sql, params) : await db.execute(sql);
     return rows;
   },
 
@@ -39,17 +41,19 @@ const ServiceModel = {
       WHERE s.est_actif = 1
       ORDER BY s.id DESC
     `;
+    const params = [];
     if (limit != null) {
       const n = Number(limit);
       if (!Number.isInteger(n) || n < 1) throw new Error('LIMIT must be a positive integer');
-      sql += ` LIMIT ${n}`;
+      sql += ` LIMIT ?`;
+      params.push(n);
     }
     if (offset != null) {
       const n = Number(offset);
       if (!Number.isInteger(n) || n < 0) throw new Error('OFFSET must be a non-negative integer');
-      if (n > 0) sql += ` OFFSET ${n}`;
+      if (n > 0) { sql += ` OFFSET ?`; params.push(n); }
     }
-    const [rows] = await db.execute(sql);
+    const [rows] = params.length > 0 ? await db.query(sql, params) : await db.execute(sql);
     return rows;
   },
 

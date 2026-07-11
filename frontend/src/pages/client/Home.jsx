@@ -108,27 +108,18 @@ export default function HomePage() {
   useEffect(() => {
     Promise.all([
       api.get('/categories').then(r => {
-        console.log('Response:', r);
         const p = r.data?.data ?? [];
-        console.log('Data:', p);
         const list = Array.isArray(p) ? p : (Array.isArray(p?.data) ? p.data : []);
-        console.log('Is Array:', Array.isArray(list));
         return list;
       }).catch(() => []),
       api.get('/techniciens').then(r => {
-        console.log('Response:', r);
         const p = r.data?.data ?? [];
-        console.log('Data:', p);
         const list = Array.isArray(p) ? p : (Array.isArray(p?.data) ? p.data : []);
-        console.log('Is Array:', Array.isArray(list));
         return list;
       }).catch(() => []),
       api.get('/services').then(r => {
-        console.log('Response:', r);
         const p = r.data?.data ?? [];
-        console.log('Data:', p);
         const list = Array.isArray(p) ? p : (Array.isArray(p?.data) ? p.data : []);
-        console.log('Is Array:', Array.isArray(list));
         return list;
       }).catch(() => []),
       api.get('/stats/overview').then(r => r.data.data).catch(() => ({ techniciens: 0, reservations: 0, reviews: 0 })),
@@ -200,7 +191,7 @@ export default function HomePage() {
           </div>
           <div className="flex flex-wrap gap-2 mt-6 items-center">
             <span className="text-sm text-white/75 mr-2">{t('home.popular_label')}</span>
-            {categories.slice(0, 5).map(c => (
+            {categories.slice().map(c => (
               <button onClick={() => setSelectedCategory(selectedCategory === c.nom ? null : c.nom)}
                 className={`py-[6px] px-4 border rounded-full text-sm cursor-pointer backdrop-blur-[4px] font-body transition-all duration-[var(--transition-base)] ${
                   selectedCategory === c.nom
@@ -239,7 +230,8 @@ export default function HomePage() {
               key={s.id}
               service={s}
               onBook={(svc) => {
-                if (!user) { navigate('/login'); return; }
+               if (!user) { navigate('/login'); return; }
+
                 setSelectedService(svc);
               }}
             />

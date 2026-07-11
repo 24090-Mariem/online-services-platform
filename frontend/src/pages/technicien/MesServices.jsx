@@ -22,18 +22,12 @@ export default function MesServices() {
         api.get('/services/mine'),
         api.get('/categories'),
       ]);
-      console.log('Response:', sRes);
       const sPayload = sRes.data?.data ?? [];
-      console.log('Data:', sPayload);
       const sList = Array.isArray(sPayload) ? sPayload : (Array.isArray(sPayload?.data) ? sPayload.data : []);
-      console.log('Is Array:', Array.isArray(sList));
       setServices(sList);
 
-      console.log('Response:', cRes);
       const cPayload = cRes.data?.data ?? [];
-      console.log('Data:', cPayload);
       const cList = Array.isArray(cPayload) ? cPayload : (Array.isArray(cPayload?.data) ? cPayload.data : []);
-      console.log('Is Array:', Array.isArray(cList));
       setCategories(cList);
     } catch {
       toast.error('Erreur lors du chargement');

@@ -1,4 +1,3 @@
-const pool = require('../config/db');
 const { validationResult } = require('express-validator');
 const AdministrateurModel = require('../models/AdministrateurModel');
  

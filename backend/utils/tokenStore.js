@@ -89,9 +89,7 @@ class TokenStore {
       );
 
       if (result.affectedRows > 0) {
-        console.log(
-          `[TokenStore] cleanup: ${result.affectedRows} tokens supprimés`
-        );
+        // cleanup logged
       }
     } catch (err) {
       console.error('[TokenStore] cleanup error:', err);

@@ -14,11 +14,8 @@ export default function GestionAvis() {
     (async () => {
       try {
         const res = await api.get('/reviews');
-        console.log('Response:', res);
         const payload = res.data?.data ?? [];
-        console.log('Data:', payload);
         const list = Array.isArray(payload) ? payload : (Array.isArray(payload?.data) ? payload.data : []);
-        console.log('Is Array:', Array.isArray(list));
         setReviews(list);
       } catch {
         setError(t('admin.load_error'));

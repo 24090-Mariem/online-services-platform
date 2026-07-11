@@ -246,6 +246,7 @@
      "confirm": "Réserver",
      "cancel": "Annuler",
      "book_title": "Reservation du service"
+     
   },
   "services": {
     "my_title": "Mes Services",
@@ -253,10 +254,10 @@
     "new_service": "+ Nouveau service",
     "edit_title": "Modifier le service",
     "new_title": "Nouveau service",
-    "label_titre": "Titre *",
+    "label_titre": "Titre",
     "label_description": "Description",
-    "label_categorie": "Catégorie *",
-    "label_prix": "Prix (DH)",
+    "label_categorie": "Catégorie",
+    "label_prix": "Prix MRU",
     "label_duree": "Durée (minutes)",
     "label_image": "Image",
     "placeholder_select": "Sélectionnez",

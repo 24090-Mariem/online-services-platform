@@ -15,7 +15,7 @@ createRoot(document.getElementById('root')).render(
         <AuthProvider>
           <NotificationProvider>
             <App />
-          </NotificationProvider>
+            </NotificationProvider>
         </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>

@@ -41,23 +41,6 @@ const AdministrateurModel = {
     return rows[0] || null;
   },
 
-  async findByUserId(userId) {
-    const [rows] = await pool.execute(
-      'SELECT * FROM administrateurs WHERE user_id = ?',
-      [userId]
-    );
-    return rows[0] || null;
-  },
-
-  async create(data) {
-    const { user_id, nom } = data;
-    const [result] = await pool.execute(
-      'INSERT INTO administrateurs (user_id, nom) VALUES (?, ?)',
-      [user_id, nom]
-    );
-    return result.insertId;
-  },
-
   async update(id, data) {
     const fields = [];
     const values = [];

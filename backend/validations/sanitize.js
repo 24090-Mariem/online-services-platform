@@ -25,7 +25,6 @@ const sanitizeObject = (obj, fields, mode = 'plain') => {
 };
 
 module.exports = {
-  sanitizeHtml,
   sanitizePlainText,
   sanitizeObject,
 };

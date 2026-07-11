@@ -68,18 +68,12 @@ export default function GestionTechniciens() {
         api.get('/techniciens/all'),
         api.get('/categories'),
       ]);
-      console.log('Response:', techRes);
       const techPayload = techRes.data?.data ?? [];
-      console.log('Data:', techPayload);
       const techList = Array.isArray(techPayload) ? techPayload : (Array.isArray(techPayload?.data) ? techPayload.data : []);
-      console.log('Is Array:', Array.isArray(techList));
       setTechniciens(techList);
 
-      console.log('Response:', catRes);
       const catPayload = catRes.data?.data ?? [];
-      console.log('Data:', catPayload);
       const catList = Array.isArray(catPayload) ? catPayload : (Array.isArray(catPayload?.data) ? catPayload.data : []);
-      console.log('Is Array:', Array.isArray(catList));
       setCategories(catList);
     } catch {
       showMessage('error', t('admin.load_error_generic'));

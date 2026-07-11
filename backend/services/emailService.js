@@ -55,22 +55,6 @@ async function sendWelcomeWithLink(to, nom, prenom, setupLink) {
   });
 }
 
-async function sendWelcomeEmail(to, nom, prenom) {
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM || process.env.SMTP_USER,
-    to,
-    subject: 'Bienvenue sur notre plateforme de services',
-    text: `Bonjour ${prenom} ${nom},\n\nVotre compte a été créé avec succès.\n\nCordialement,\nL'équipe de la plateforme`,
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto;">
-        <h2 style="color: #6366f1;">Bienvenue ${prenom} ${nom} !</h2>
-        <p>Votre compte a été créé avec succès.</p>
-        <p style="color: #6b7280; font-size: 14px; margin-top: 24px;">Cordialement,<br>L'équipe de la plateforme</p>
-      </div>
-    `,
-  });
-}
-
 async function sendDemandeConfirmation(to, nom, prenom) {
   await transporter.sendMail({
     from: process.env.SMTP_FROM || process.env.SMTP_USER,
@@ -94,4 +78,4 @@ async function sendDemandeConfirmation(to, nom, prenom) {
   });
 }
 
-module.exports = { sendPasswordResetEmail, sendWelcomeEmail, sendWelcomeWithLink, sendDemandeConfirmation };
+module.exports = { sendPasswordResetEmail, sendWelcomeWithLink, sendDemandeConfirmation };

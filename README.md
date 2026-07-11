@@ -88,27 +88,7 @@ Elle permet aux utilisateurs de rechercher des services, trouver des techniciens
 
 ---
 
-# Architecture du projet
-Services/
-├── frontend/
-│ ├── src/
-│ │ ├── components/ # Composants React réutilisables
-│ │ ├── pages/ # Pages de l'application
-│ │ ├── services/ # Appels API
-│ │ ├── context/ # Context API
-│ │ └── utils/ # Fonctions utilitaires
-│ └── package.json
-│
-├── backend/
-│ ├── controllers/ # Gestion des requêtes HTTP
-│ ├── models/ # Modèles base de données
-│ ├── routes/ # Routes API
-│ ├── services/ # Logique métier
-│ ├── middlewares/ # Authentification et sécurité
-│ ├── validations/ # Validation des données
-│ └── package.json
-│
-└── README.md
+
 
 
 ---
